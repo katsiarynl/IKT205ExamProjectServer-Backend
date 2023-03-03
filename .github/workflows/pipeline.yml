@@ -2,16 +2,7 @@ name: CI
 
 on: [push]
 jobs: 
-  job1: 
-  
-    runs-on: ubuntu-latest
-    
-    steps:
-     - uses: actions/checkout@v3
-     - name: test checkout
-       run: echo Hellooooooooooooooooooooooooooooooooooooo 
-   
-  job2:
+  jest:
     runs-on: windows-latest 
     steps:
      - name: Setup Node.js environment
@@ -22,7 +13,16 @@ jobs:
        run:  npm install
      - name: Run Jest
        uses: jlndk/github-action-jest@1.0.3
- 
+  linting:
+    needs: [jest]
+    runs-on: windows-latest
+    steps: 
+     - name: Setup Node.js environment
+       uses: actions/setup-node@v3.6.0
+     - name: Checkout code
+       uses: actions/checkout@v3
+     - name: linting
+       uses: ryanclark/lint-action@v1.15.0
 
      
 
