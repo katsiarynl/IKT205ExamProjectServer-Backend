@@ -2,7 +2,7 @@ name: CI
 
 on: [push]
 jobs: 
-  build: 
+  job1: 
   
     runs-on: ubuntu-latest
     
@@ -11,7 +11,7 @@ jobs:
      - name: test checkout
        run: echo Hellooooooooooooooooooooooooooooooooooooo 
    
-  test:
+  job2:
     runs-on: windows-latest 
     steps:
      - name: Setup Node.js environment
