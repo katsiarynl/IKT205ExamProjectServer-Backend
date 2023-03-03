@@ -38,14 +38,8 @@ jobs:
        uses: actions/setup-node@v3.6.0
      - name: Checkout code
        uses: actions/checkout@v3
-     - name: ESLint checker
-  # You may pin to the exact commit or the version.
-  # uses: ninosaurus/eslint-check@30ce7263e3f4b0bebc3cc06897bdf4ab8524a424
-       uses: ninosaurus/eslint-check@v5.3.1
-       with:
-        repo-token:  ${{ secrets.TOKEN }}
-        custom-directory: 'node_modules'
-        eslint-config-path: '.eslintrc.json'
+     - name: install eslint dep
+       run: npx eslint .
 
        
 
