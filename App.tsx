@@ -1,7 +1,8 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-// hey. test hello. test 5
+// hey. test hello. test 5. 6
+
 export default function App() {
   let a = "1";
   const b = "2";
