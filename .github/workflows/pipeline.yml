@@ -1,6 +1,6 @@
 name: CI
 
-on: push
+on: [push]
 jobs: 
   build: 
   
@@ -9,4 +9,4 @@ jobs:
     steps:
      - uses: actions/checkout@v3
      - name: test checkout
-       run: echo Hello  
+       run: echo Hellooooooooooooooooooooooooooooooooooooo 
