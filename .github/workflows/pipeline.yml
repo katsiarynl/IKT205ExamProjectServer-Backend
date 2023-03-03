@@ -17,6 +17,8 @@ jobs:
         node-version: 19.0.1
      - name: Checkout code
        uses: actions/checkout@v3
+       with:
+         ref: ${{ github.ref_name }}
      - name: npm install
        run:  npm install
      - name: Run Jest
