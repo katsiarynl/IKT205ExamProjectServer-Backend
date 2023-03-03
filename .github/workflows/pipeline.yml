@@ -22,10 +22,7 @@ jobs:
      - name: Run Jest
        uses: jlndk/github-action-jest@1.0.3
        with:
-          test-command: 'npm run test'
-          coverage-comment: true
-          changes-only: true
-          dry-run: true
+          working-directory: IKT205ExamProject
   linting:
     needs: [jest]
     runs-on: windows-latest
