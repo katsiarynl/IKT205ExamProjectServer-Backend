@@ -8,11 +8,6 @@ permissions:
   id-token: write
   contents: read
 jobs: 
-  require_approval: 
-    runs-on: windows-latest 
-    steps:
-     - name: Require Pull Request approvals
-       uses: manuelmeister/require-approved-pull-request-action@0.0.1
   jest:
     runs-on: windows-latest 
     steps:
