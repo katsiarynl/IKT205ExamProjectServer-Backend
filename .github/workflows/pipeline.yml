@@ -2,11 +2,7 @@ name: CI
  
  #https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
 on:
-  push:
-    branches:
-      - test 
-
-
+  push
 jobs: 
   jest:
     runs-on: windows-latest 
