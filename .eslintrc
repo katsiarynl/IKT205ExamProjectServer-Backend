@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.spec.js",
+        "**/__mocks__/**, **/__tests__/**",
+        "**/*.test.js",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "env": {
+        "jest": true
+      }
+    }
+  ],
+  "rules": {
+    // suppress errors for missing 'import React' in files
+    "react/react-in-jsx-scope": "off",
+    // allow jsx syntax in js files (for next.js project)
+    "react/jsx-filename-extension": "off" //should add ".ts" if typescript project
+  }
+}
