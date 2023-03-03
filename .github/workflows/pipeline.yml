@@ -1,7 +1,7 @@
 name: CI
  
  #https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
-on: [pull_request]
+on: [push, pull_request]
 env:
   GITHUB_TOKEN: ${{secrets.TOKEN}}
 permissions:
@@ -31,6 +31,17 @@ jobs:
        uses: actions/checkout@v3
      - name: linting
        uses: ryanclark/lint-action@v1.15.0
+  eslint:
+    needs: [jest, linting]
+    runs-on: windows-latest
+    steps: 
+     - name: Setup Node.js environment
+       uses: actions/setup-node@v3.6.0
+     - name: Checkout code
+       uses: actions/checkout@v3
+     - name: npx linting
+       run: npx eslint .
+       
        
        
 
