@@ -23,27 +23,17 @@ jobs:
        uses: jlndk/github-action-jest@1.0.3
   linting:
     needs: [jest]
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps: 
      - name: Setup Node.js environment
        uses: actions/setup-node@v3.6.0
      - name: Checkout code
        uses: actions/checkout@v3
+     - name: npm install
+       run:  npm install
      - name: linting
        uses: ryanclark/lint-action@v1.15.0
-       with:
-          eslint: true
-  eslint:
-    runs-on: windows-latest
-    steps: 
-     - name: Setup Node.js environment
-       uses: actions/setup-node@v3.6.0
-     - name: install eslint 
-       run: npm install --save-dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint typescript
-     - name: Checkout code
-       uses: actions/checkout@v3
-     - name: Super-Linter
-       uses: github/super-linter@v4.10.1
+
 
        
 
