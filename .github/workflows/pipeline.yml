@@ -2,6 +2,8 @@ name: CI
  
  #https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
 on: [push, pull_request]
+env:
+ GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 jobs: 
   jest:
     runs-on: windows-latest 
