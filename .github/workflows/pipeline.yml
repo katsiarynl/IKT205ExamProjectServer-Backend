@@ -4,6 +4,9 @@ name: CI
 on: [push, pull_request]
 env:
  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+permissions:
+  id-token: write
+  contents: read
 jobs: 
   jest:
     runs-on: windows-latest 
