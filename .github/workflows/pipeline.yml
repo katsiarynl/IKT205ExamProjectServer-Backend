@@ -38,6 +38,8 @@ jobs:
        uses: actions/setup-node@v3.6.0
      - name: install eslint 
        run: npm install --save-dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint typescript
+     - name: another install 
+       run: npm install @typescript-eslint/eslint-plugin --save-dev
      - name: Checkout code
        uses: actions/checkout@v3
      - name: Run ESLint
