@@ -22,11 +22,10 @@ jobs:
      - name: Run Jest
        uses: jlndk/github-action-jest@1.0.3
        with:
-          test-command: 'npm run test:ci'
+          test-command: 'npm run test'
           coverage-comment: true
           changes-only: true
           dry-run: true
-          fail-action-if-jest-fails: false
   linting:
     needs: [jest]
     runs-on: windows-latest
