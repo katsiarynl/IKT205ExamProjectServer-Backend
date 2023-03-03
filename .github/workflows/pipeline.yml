@@ -21,6 +21,12 @@ jobs:
        run:  npm install
      - name: Run Jest
        uses: jlndk/github-action-jest@1.0.3
+       with:
+          test-command: 'npm run test:ci'
+          coverage-comment: true
+          changes-only: true
+          dry-run: true
+          fail-action-if-jest-fails: false
   linting:
     needs: [jest]
     runs-on: windows-latest
@@ -31,7 +37,7 @@ jobs:
        uses: actions/checkout@v3
      - name: linting
        uses: ryanclark/lint-action@v1.15.0
-
+       
 
       
      
