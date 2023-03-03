@@ -32,15 +32,16 @@ jobs:
      - name: linting
        uses: ryanclark/lint-action@v1.15.0
   eslint:
-    needs: [jest, linting]
     runs-on: windows-latest
     steps: 
      - name: Setup Node.js environment
        uses: actions/setup-node@v3.6.0
      - name: Checkout code
        uses: actions/checkout@v3
-     - name: npx linting
-       run: npx eslint .
+     - name: Eslint check
+  # You may pin to the exact commit or the version.
+  # uses: krizzu/eslint-check-action@a10fa11628d6ba82cd67c76b5fb7d1549d55039e
+       uses: krizzu/eslint-check-action@v1.1.0
        
        
        
