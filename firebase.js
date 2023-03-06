@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 //https://firebase.google.com/docs/database/web/start
-const firebase = require("firebase");
 const firebaseConfig = {
   apiKey: "AIzaSyDhnMMEDN9PRPmpwMNjZE-lklN5b19RjEA",
   authDomain: "studentfirebase-8c937.firebaseapp.com",
@@ -12,6 +11,8 @@ const firebaseConfig = {
   measurementId: "G-8Y29BN65XN",
 };
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-export const auth = firebase.auth();
+const db = getDatabase(app);
+
+export default db;

@@ -5,5 +5,3 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
   };
 };
-
-//  this is for testging a pull request. here
