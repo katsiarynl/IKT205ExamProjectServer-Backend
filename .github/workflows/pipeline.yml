@@ -1,0 +1,51 @@
+name: CI
+ 
+ #https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
+on: [push, pull_request]
+env:
+  GITHUB_TOKEN: ${{secrets.TOKEN}}
+permissions:
+  id-token: write
+  contents: read
+jobs: 
+  jest:
+    runs-on: windows-latest 
+    steps:
+     - name: Setup Node.js environment
+       uses: actions/setup-node@v3.6.0
+       with: 
+        node-version: 19.0.1
+     - name: Checkout code
+       uses: actions/checkout@v3
+     - name: npm install
+       run:  npm install
+     - name: Run Jest
+       uses: jlndk/github-action-jest@1.0.3
+#   linting:
+#     needs: [jest]
+#     runs-on: windows-latest
+#     steps: 
+#      - name: Setup Node.js environment
+#        uses: actions/setup-node@v3.6.0
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#      - name: linting
+#        uses: ryanclark/lint-action@v1.15.0
+  eslint:
+    needs: [jest]
+    runs-on: windows-latest
+    steps: 
+     - name: Setup Node.js environment
+       uses: actions/setup-node@v3.6.0
+     - name: Checkout code
+       uses: actions/checkout@v3
+     - name: npm install
+       run:  npm install
+     - name: Run linting
+       run: npx eslint .
+
+      
+     
+    
+      
+     
