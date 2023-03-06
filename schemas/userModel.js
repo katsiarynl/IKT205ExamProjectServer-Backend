@@ -1,0 +1,45 @@
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const { Schema, model } = mongoose;
+//https://stackoverflow.com/questions/14588032/mongoose-password-hashing
+const ApplicationUserSchema = new Schema({
+  firstName: String,
+  lastName: String,
+  email: String,
+  password: String,
+  createdAt: Date,
+  updatedAt: Date,
+});
+
+ApplicationUserSchema.pre("save", function (next) {
+  var user = this;
+
+  // only hash the password if it has been modified (or is new)
+  if (!user.isModified("password")) return next();
+
+  // generate a salt
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) return next(err);
+
+    // hash the password using our new salt
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) return next(err);
+      // override the cleartext password with the hashed one
+      user.password = hash;
+      next();
+    });
+  });
+});
+
+ApplicationUserSchema.methods.comparePassword = function (
+  candidatePassword,
+  cb
+) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) return cb(err);
+    cb(null, isMatch);
+  });
+};
+
+const ApplicationUser = model("ApplicationUser", ApplicationUserSchema);
+export { ApplicationUser };
