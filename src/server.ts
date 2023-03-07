@@ -152,7 +152,7 @@ app.use((req, res, next) => {
 const start = async () => {
   try {
     await mongoose.connect(uri);
-    app.listen(5000, () => console.log("Server started on port " + PORT));
+    app.listen(process.env.PORT || 5000);
   } catch (error) {
     console.error(error);
     process.exit(1);
