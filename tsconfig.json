@@ -1,6 +1,7 @@
 {
   "extends": "expo/tsconfig.base",
-  "module": "commonjs",
+  "module": "ESNext",
+  "moduleResolution": "Node",
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
@@ -8,7 +9,6 @@
   },
   "ts-node": {
     "esm": true,
-    "moduleResolution": "Node",
     "experimentalSpecifierResolution": "node"
   }
 }
