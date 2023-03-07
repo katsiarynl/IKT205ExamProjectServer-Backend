@@ -10,6 +10,8 @@ import {
   signOut,
 } from "firebase/auth";
 
+const PORT = process.env.PORT || 1337;
+
 // https://dev.to/deepakshisood/authentication-using-firebase-for-expressjs-2l48
 
 const { Schema, model } = mongoose;
