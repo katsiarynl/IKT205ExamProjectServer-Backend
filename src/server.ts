@@ -10,7 +10,7 @@ import {
   signOut,
 } from "firebase/auth";
 
-const PORT = process.env.PORT || 1337;
+const PORT = process.env.PORT || 5000;
 
 // https://dev.to/deepakshisood/authentication-using-firebase-for-expressjs-2l48
 
@@ -152,7 +152,7 @@ app.use((req, res, next) => {
 const start = async () => {
   try {
     await mongoose.connect(uri);
-    app.listen(5000, () => console.log("Server started on port 5000"));
+    app.listen(5000, () => console.log("Server started on port " + PORT));
   } catch (error) {
     console.error(error);
     process.exit(1);
