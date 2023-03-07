@@ -4,5 +4,8 @@
     "strict": true,
     "esModuleInterop": true,
     "noImplicitAny": false
+  },
+  "ts-node": {
+    "esm": true
   }
 }
