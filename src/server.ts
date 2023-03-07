@@ -1,28 +1,20 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const http = require("http");
-const helmet = require("helmet");
+import express from "express";
+import mongoose from "mongoose";
+import helmet from "helmet";
 import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
 import "firebase/compat/database";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDhnMMEDN9PRPmpwMNjZE-lklN5b19RjEA",
-  authDomain: "studentfirebase-8c937.firebaseapp.com",
-  projectId: "studentfirebase-8c937",
-  storageBucket: "studentfirebase-8c937.appspot.com",
-  messagingSenderId: "618125972867",
-  appId: "1:618125972867:web:045e3cb90866f9f5d552b6",
-  measurementId: "G-8Y29BN65XN",
-};
-
-firebase.initializeApp(firebaseConfig);
+import auth from "../firebaseconfig";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 
 // https://dev.to/deepakshisood/authentication-using-firebase-for-expressjs-2l48
-const bcrypt = require("bcrypt");
+
 const { Schema, model } = mongoose;
 import { Blog } from "../schemas/blogModel";
-import { ApplicationUser } from "../schemas/userModel";
+
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
 
@@ -33,22 +25,23 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 
+//POST localhost:5000/register
+//POST request to register
 app.post("/register", async (req, res) => {
   try {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(
-        "lbkovskaya@icloud.com",
-        "katepassword22222"
-      )
+    createUserWithEmailAndPassword(
+      auth,
+      "kaya.lobkovskaya@bk.ru",
+      "katepassword22222"
+    )
       .then((userCredential) => {
         // Signed in
-        var user = userCredential.user;
+        const user = userCredential.user;
         console.log(user);
       })
       .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
+        const errorCode = error.code;
+        const errorMessage = error.message;
         console.log(error);
       });
     res.redirect("/");
@@ -60,56 +53,57 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   console.log("login");
-  firebase
-    .auth()
-    .signInWithEmailAndPassword("kate@nedenes.com", "katepassword22222")
+
+  signInWithEmailAndPassword(auth, "kate@nedenes.com", "katepassword22222")
     .then((userCredential) => {
-      var user = userCredential.user;
+      const user = userCredential.user;
     })
     .catch((error) => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
+      throw error;
     });
   res.redirect("/");
 });
 
-app.use((req, res, next) => {
-  var user = firebase.auth().currentUser;
-  res.locals.currentUser = user;
-  console.log(user);
-  next();
-});
-app.get("/logout", function (req, res) {
-  firebase
-    .auth()
-    .signOut()
-    .then(() => {
-      res.redirect("/login");
-    })
-    .catch((error) => {
-      // An error happened.
-    });
+// app.use((req, res, next) => {
+//   const user = firebase.auth().currentUser;
+//   res.locals.currentUser = user;
+//   console.log(user);
+//   next();
+// });
+// app.get("/logout", function (req, res) {
+//   signOut(auth)
+//     .then(() => {
+//       res.redirect("/login");
+//     })
+//     .catch((error) => {
+//       // An error happened.
+//       throw error;
+//     });
+// });
+
+//GET request to localhost:5000/users
+app.get("/blogs", async (req, res) => {
+  //mongoose
+  const allBlogs = await Blog.find();
+  console.log(allBlogs);
+  return res.status(200).json(allBlogs);
 });
 
-app.get("/users", async (req, res) => {
-  const allUsers = await ApplicationUser.find();
-  console.log(allUsers);
-  return res.status(200).json(allUsers);
-});
-
-app.get("/users/:id", async (req, res) => {
+//GET request. path: localhost:5000/users/
+app.get("/blogs/:id", async (req, res) => {
   const { id } = req.params;
-  const blog = await ApplicationUser.findById(id);
+  const blog = await Blog.findById(id);
   return res.status(200).json(blog);
 });
 
-app.delete("/users/:id", async (req, res) => {
+//DELETE request. path: localhost:5000/users/
+app.delete("/blogs/:id", async (req, res) => {
   const { id } = req.params;
-  const deletedUser = await ApplicationUser.findByIdAndDelete(id);
-  return res.status(200).json(deletedUser);
+  const deleteBlog = await Blog.findByIdAndDelete(id);
+  return res.status(200).json(deleteBlog);
 });
 
-app.post("/users/", async (req, res) => {
+app.post("/blogs/", async (req, res) => {
   const date = new Date();
   //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
   const datestring =
@@ -120,21 +114,30 @@ app.post("/users/", async (req, res) => {
     date.getFullYear() +
     " ";
   console.log(datestring);
-  const newUser = new ApplicationUser({
-    firstName: "Kate",
-    lastName: "LAstName",
-    email: "email",
-    password: "lalalalala",
-    createdAt: datestring,
+  const newBlog = new Blog({
+    title: "Title",
+    slug: "slug",
+
+    author: "author",
+    content: "content",
   });
-  const insertedUser = await newUser.save();
-  return res.status(201).json(insertedUser);
+  const insertedBlog = await newBlog.save();
+  return res.status(201).json(insertedBlog);
 });
 
 app.put("/blogs/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(req.body);
+  // console.log(req.body);
+  const InsertedBlog = new Blog({
+    title: "String",
+    slug: "String",
+    published: "Boolean",
+    author: "String",
+    content: "String",
+  });
+
   await Blog.findByIdAndUpdate(id, req.body);
+  //await Blog.findByIdAndUpdate(id, { InsertedBlog });
   const updatedBlog = await Blog.findById(id);
   console.log(updatedBlog);
   return res.status(200).json(updatedBlog);

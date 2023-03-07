@@ -11,6 +11,9 @@
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsp -p ."
   },
+  "compilerOptions": {
+    "module": "CommonJS"
+  },
   "jest": {
     "preset": "ts-jest",
     "transform": {
@@ -25,6 +28,7 @@
     },
     "moduleFileExtensions": [
       "js",
+      "ts",
       "mjs",
       "jsx",
       "json",
