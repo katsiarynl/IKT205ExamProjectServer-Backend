@@ -2,7 +2,6 @@
   "name": "ikt205finalproject",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
-  "type": "module",
   "engines": {
     "node": "19.4.0",
     "npm": "9.2.0"
