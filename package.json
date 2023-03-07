@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "rimraf ./build && tsc",
-    "start": "node src/server.ts",
+    "start": "ts-node src/server.ts",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
