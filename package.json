@@ -33,8 +33,9 @@
     },
     "moduleFileExtensions": [
       "js",
-      "ts",
       "mjs",
+      "ts",
+      "tsx",
       "jsx",
       "json",
       "node",
