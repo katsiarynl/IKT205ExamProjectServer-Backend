@@ -5,7 +5,9 @@
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "module": "es6",
+    "target": "es5"
   },
   "ts-node": {
     "esm": true,
