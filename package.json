@@ -2,14 +2,19 @@
   "name": "ikt205finalproject",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "type": "module",
+  "engines": {
+    "node": "19.4.0",
+    "npm": "9.2.0"
+  },
   "scripts": {
-    "start": "expo start",
+    "build": "rimraf ./build && tsc",
+    "start": "ts-node src/server.ts",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "dev": "nodemon --exec ts-node src/server.ts",
-    "build": "tsp -p ."
+    "dev": "nodemon --exec ts-node src/server.ts"
   },
   "compilerOptions": {
     "module": "CommonJS"
@@ -28,8 +33,9 @@
     },
     "moduleFileExtensions": [
       "js",
-      "ts",
       "mjs",
+      "ts",
+      "tsx",
       "jsx",
       "json",
       "node",
@@ -73,5 +79,17 @@
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
   },
-  "private": true
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katsiarynl/-IKT205ExamProjectBackend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/katsiarynl/-IKT205ExamProjectBackend/issues"
+  },
+  "homepage": "https://github.com/katsiarynl/-IKT205ExamProjectBackend#readme",
+  "description": ""
 }
