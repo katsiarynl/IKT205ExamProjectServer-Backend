@@ -144,7 +144,7 @@ app.put("/blogs/:id", async (req, res) => {
   console.log(updatedBlog);
   return res.status(200).json(updatedBlog);
 });
-
+//respond when smth is updated
 app.get("/update", async (req, res) => {
   //mongoose
   Blog.watch().on("change", async (data) => {
