@@ -144,15 +144,27 @@ app.put("/blogs/:id", async (req, res) => {
   console.log(updatedBlog);
   return res.status(200).json(updatedBlog);
 });
+//respond when smth is updated
+app.get("/update", async (req, res) => {
+  //mongoose
+  Blog.watch().on("change", async (data) => {
+    console.log(data);
 
+    const allBlogs = await Blog.find();
+    console.log(allBlogs);
+    return res.status(200).json(allBlogs);
+  });
+});
 app.use((req, res, next) => {
-  res.status(404).send("This is a test.! mongodb");
+  res.status(404).send(" mongodb");
 });
 
 const start = async () => {
   try {
     await mongoose.connect(uri);
-    app.listen(process.env.PORT || 5000);
+    app.listen(PORT, () => {
+      console.log("listening on " + PORT);
+    });
   } catch (error) {
     console.error(error);
     process.exit(1);
