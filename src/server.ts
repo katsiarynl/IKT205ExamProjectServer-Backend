@@ -2,8 +2,18 @@ import express from "express";
 import mongoose from "mongoose";
 import helmet from "helmet";
 import firebase from "firebase/compat/app";
+import { Restraunt } from "../schemas/restrauntModel";
+
 import "firebase/compat/database";
 import auth from "../firebaseconfig";
+import Stripe from "stripe";
+const stripe = new Stripe(
+  "sk_test_51MjtQyKZ0QuxsIgFuJ7CepFaI5NM0Ikf8uKOqQrNahb2sA0gPJzmPnjDtqCuPV4pO6Ze3RlKUpgGtjhykBD9Zx7g00oeNYI3l4",
+  {
+    apiVersion: "2022-11-15",
+  }
+);
+
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -15,6 +25,7 @@ const PORT = process.env.PORT || 5000;
 // https://dev.to/deepakshisood/authentication-using-firebase-for-expressjs-2l48
 
 const { Schema, model } = mongoose;
+
 import { Blog } from "../schemas/blogModel";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
@@ -52,6 +63,49 @@ app.post("/register", async (req, res) => {
   }
 });
 
+app.post("/v1/prices", async (req, res) => {
+  //mongoose
+  const price = await stripe.prices.create({
+    unit_amount: 2000,
+    currency: "nok",
+    recurring: { interval: "month" },
+    product: "prod_NUu2RGsnPGeRN4",
+  });
+  return res.status(200).json(price);
+});
+app.post("/v1/products", async (req, res) => {
+  //mongoose
+  const product = await stripe.products.create({
+    name: "Gold NOT Special",
+  });
+  return res.status(200).json(product);
+});
+
+app.get("/create-checkout-session", async (req, res) => {
+  console.log("hello");
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+
+        quantity: 1,
+
+        price: "price_1MjuErKZ0QuxsIgFG3P4dIkU",
+      },
+    ],
+    currency: "nok",
+    mode: "subscription",
+    success_url: `http://localhost:5000/success`,
+    cancel_url: `http://localhost:5000/cancel`,
+  });
+  const redirecturl = session.url || "http://localhost:5000";
+
+  return res.status(200).json(redirecturl);
+});
+
+app.use("/success", async (req, res) => {
+  console.log("login");
+});
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   console.log("login");
@@ -84,18 +138,18 @@ app.post("/login", async (req, res) => {
 // });
 
 //GET request to localhost:5000/users
-app.get("/blogs", async (req, res) => {
+app.get("/restraunts", async (req, res) => {
   //mongoose
-  const allBlogs = await Blog.find();
-  console.log(allBlogs);
-  return res.status(200).json(allBlogs);
+  const allRestraunts = await Restraunt.find();
+  console.log(allRestraunts);
+  return res.status(200).json(allRestraunts);
 });
 
 //GET request. path: localhost:5000/users/
-app.get("/blogs/:id", async (req, res) => {
+app.get("/restraunt/:id", async (req, res) => {
   const { id } = req.params;
-  const blog = await Blog.findById(id);
-  return res.status(200).json(blog);
+  const restraunt = await Restraunt.findById(id);
+  return res.status(200).json(restraunt);
 });
 
 //DELETE request. path: localhost:5000/users/
@@ -105,26 +159,26 @@ app.delete("/blogs/:id", async (req, res) => {
   return res.status(200).json(deleteBlog);
 });
 
-app.post("/blogs/", async (req, res) => {
-  const date = new Date();
-  //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
-  const datestring =
-    date.getDate() +
-    "-" +
-    (date.getMonth() + 1) +
-    "-" +
-    date.getFullYear() +
-    " ";
-  console.log(datestring);
-  const newBlog = new Blog({
-    title: "Title",
-    slug: "slug",
-
-    author: "author",
-    content: "content",
+app.post("/restraunts/", async (req, res) => {
+  console.log("hello");
+  const newRestraunt = new Restraunt({
+    name: "String",
+    address: "String",
+    rating: 5,
+    photos:
+      "https://www.foodiesfeed.com/wp-content/uploads/2019/06/top-view-for-box-of-2-burgers-home-made-600x899.jpg",
+    menu: [
+      {
+        category: "category1",
+        meals: [
+          { name: "String", price: "String", description: "String" },
+          { name: "String1", price: "String1", description: "String1" },
+        ],
+      },
+    ],
   });
-  const insertedBlog = await newBlog.save();
-  return res.status(201).json(insertedBlog);
+  const insertedRestraunt = await newRestraunt.save();
+  return res.status(201).json(insertedRestraunt);
 });
 
 app.put("/blogs/:id", async (req, res) => {
