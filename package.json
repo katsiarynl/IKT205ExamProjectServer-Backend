@@ -4,7 +4,6 @@
   "main": "node_modules/expo/AppEntry.js",
   "type": "module",
   "engines": {
-    "node": "19.4.0",
     "npm": "9.2.0"
   },
   "scripts": {
@@ -51,6 +50,7 @@
     ]
   },
   "dependencies": {
+    "@types/stripe": "^8.0.417",
     "babel-jest": "^29.4.3",
     "bcrypt": "^5.1.0",
     "expo": "~48.0.4",
@@ -64,6 +64,7 @@
     "react": "18.2.0",
     "react-native": "0.71.3",
     "react-test-renderer": "^18.2.0",
+    "stripe": "^11.14.0",
     "ts-jest": "^29.0.5"
   },
   "devDependencies": {
