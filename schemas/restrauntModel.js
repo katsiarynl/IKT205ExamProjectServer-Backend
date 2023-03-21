@@ -12,7 +12,7 @@ const restrauntSchema = new Schema({
       meals: [
         {
           name: String,
-          price: String,
+          price: Number,
           description: String,
         },
       ],
