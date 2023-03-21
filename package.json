@@ -4,6 +4,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "type": "module",
   "engines": {
+    "node": "19.4.0",
     "npm": "9.2.0"
   },
   "scripts": {
