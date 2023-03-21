@@ -178,7 +178,7 @@ app.post("/restraunts/", async (req, res) => {
       {
         category: "category1",
         meals: [
-          { name: "String", price: 100, description: "String" },
+          { name: "String", price: 22, description: "String" },
           { name: "String1", price: 33, description: "String1" },
         ],
       },
