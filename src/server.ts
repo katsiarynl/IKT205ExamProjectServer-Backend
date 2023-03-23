@@ -32,7 +32,7 @@ import { Blog } from "../schemas/blogModel";
 //https://www.npmjs.com/package/bcrypt
 
 const uri =
-  "mongodb+srv://katsiarynl:6tZbx2OTW99ex9fd@cluster0.83jtahe.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
 const app = express();
 app.use(helmet());
@@ -95,6 +95,7 @@ app.get("/create-checkout-session", async (req, res) => {
     ],
     currency: "nok",
     mode: "subscription",
+
     success_url: `http://localhost:5000/success`,
     cancel_url: `http://localhost:5000/cancel`,
   });
@@ -103,8 +104,42 @@ app.get("/create-checkout-session", async (req, res) => {
   return res.status(200).json(redirecturl);
 });
 
+app.post("/create-checkout-session", async (req, res) => {
+  console.log(req.body);
+
+  console.log("--------------------");
+  req.body.map((item) => console.log(item.id));
+
+  const session = await stripe.checkout.sessions.create({
+    line_items: req.body.map((item) => {
+      return {
+        price_data: {
+          currency: "nok",
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: item.price * 100,
+        },
+        quantity: item.cartQuantity,
+      };
+    }),
+
+    // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+    invoice_creation: { enabled: true },
+
+    currency: "nok",
+    mode: "payment",
+    success_url: `http://localhost:5000/success`,
+    cancel_url: `http://localhost:5000/cancel`,
+  });
+  const redirecturl = session.url || "http://localhost:5000";
+  console.log(res);
+  return res.status(200).json(redirecturl);
+});
+
 app.use("/success", async (req, res) => {
   console.log("login");
+  return res.status(200);
 });
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
