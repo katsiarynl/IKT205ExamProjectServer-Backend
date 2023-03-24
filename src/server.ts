@@ -125,7 +125,7 @@ app.post("/create-checkout-session", async (req, res) => {
     }),
 
     // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-    invoice_creation: { enabled: true },
+    // invoice_creation: { enabled: true },
 
     currency: "nok",
     mode: "payment",
