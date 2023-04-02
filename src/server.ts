@@ -5,7 +5,11 @@ import firebase from "firebase/compat/app";
 import { Restraunt } from "../schemas/restrauntModel";
 
 import "firebase/compat/database";
-import auth from "../firebaseconfig";
+//import auth from "../firebaseconfig";
+// importing the auth from the main firebaseConfigPro
+
+import { auth } from "../firebaseConfigPro";
+
 import Stripe from "stripe";
 const stripe = new Stripe(
   "sk_test_51MjtQyKZ0QuxsIgFuJ7CepFaI5NM0Ikf8uKOqQrNahb2sA0gPJzmPnjDtqCuPV4pO6Ze3RlKUpgGtjhykBD9Zx7g00oeNYI3l4",
@@ -35,8 +39,58 @@ const uri =
   "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
 const app = express();
-app.use(helmet());
+//app.use(helmet());
 app.use(express.json());
+
+// creating the post request to /SignUp
+
+app.post("/signUp", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required!" });
+  }
+  try {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((newUserCredential) => {
+        const newUser = newUserCredential.user;
+        console.log(newUser);
+        res.json({ message: "User Registered Successfully" });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(error);
+        res.status(400).json({ error: errorMessage });
+      });
+  } catch {
+    res.status(500).json({ error: "internal server Error!" });
+  }
+});
+// creating the sign in post with signIn
+
+app.post("/signIn", async (req, res) => {
+  const { email, password } = req.body;
+  // checking if the user post without email and password
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and Password is required!" });
+  }
+  try {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((existingUser) => {
+        const user = existingUser.user;
+        console.log(user);
+        res.json({ message: "User Signed In Successfully" });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(error);
+      });
+  } catch {
+    res.status(500).json({ error: "internal Server Error!" });
+  }
+});
 
 //POST localhost:5000/register
 //POST request to register
