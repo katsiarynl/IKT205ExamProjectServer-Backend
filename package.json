@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "rimraf ./build && tsc",
-    "start": "ts-node src/server.ts",
+    "start": "ts-node --optimize_for_size --max_old_space_size=460 src/server.ts",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
