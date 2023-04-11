@@ -4,11 +4,37 @@ import helmet from "helmet";
 import firebase from "firebase/compat/app";
 import { Restraunt } from "../schemas/restrauntModel";
 
+import jwt from "jsonwebtoken";
+import { initializeApp } from "firebase-admin";
+
 import "firebase/compat/database";
 //import auth from "../firebaseconfig";
 // importing the auth from the main firebaseConfigPro
 
 import { auth } from "../firebaseConfigPro";
+import admin from "firebase-admin";
+import serviceAccount from "../serviceAccount.json" assert { type: "json" };
+
+const params = {
+  type: serviceAccount.type,
+  projectId: serviceAccount.project_id,
+  privateKeyId: serviceAccount.private_key_id,
+  privateKey: serviceAccount.private_key,
+  clientEmail: serviceAccount.client_email,
+  clientId: serviceAccount.client_id,
+  authUri: serviceAccount.auth_uri,
+  tokenUri: serviceAccount.token_uri,
+  authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
+  clientC509CertUrl: serviceAccount.client_x509_cert_url,
+};
+
+admin.initializeApp({
+  credential: admin.credential.cert(params),
+  databaseURL: "https://cooktogo-cec09-default-rtdb.firebaseio.com",
+});
+
+// Initialize the Admin App
+// creating post api called isAuthenticated
 
 import Stripe from "stripe";
 const stripe = new Stripe(
@@ -31,6 +57,9 @@ const PORT = process.env.PORT || 5000;
 const { Schema, model } = mongoose;
 
 import { Blog } from "../schemas/blogModel";
+import { ActivityIndicatorComponent } from "react-native";
+import { Server } from "http";
+import { async } from "@firebase/util";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
@@ -67,28 +96,79 @@ app.post("/signUp", async (req, res) => {
     res.status(500).json({ error: "internal server Error!" });
   }
 });
+
+app.get("/isAuthenticated", async (req, res) => {
+  try {
+    // Check if Authorization header is present and in the expected format
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Extract the ID token from the Authorization header
+    const idToken = authHeader.split(" ")[1];
+
+    // Verify ID token and get user info
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+
+    // Return true if user is authenticated
+    res.json({ isAuthenticated: true });
+    console.log(idToken);
+  } catch (error) {
+    console.error(error);
+
+    // Return false if user is not authenticated
+    res.json({ isAuthenticated: false });
+  }
+});
+
+//creating the isAuth
+
 // creating the sign in post with signIn
 
 app.post("/signIn", async (req, res) => {
   const { email, password } = req.body;
+
   // checking if the user post without email and password
   if (!email || !password) {
     return res.status(400).json({ error: "Email and Password is required!" });
   }
+
   try {
     signInWithEmailAndPassword(auth, email, password)
-      .then((existingUser) => {
+      .then(async (existingUser) => {
         const user = existingUser.user;
         console.log(user);
-        res.json({ message: "User Signed In Successfully" });
+
+        const idToken = await user.getIdToken();
+        console.log(idToken);
+
+        res.json({
+          accessToken: idToken,
+          message: "User Signed In Successfully",
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(error);
+        res.status(400).json({ error: errorMessage });
       });
   } catch {
     res.status(500).json({ error: "internal Server Error!" });
+  }
+});
+
+// post request for the Signout post
+
+app.post("/singOut", async (req, res) => {
+  try {
+    await auth.signOut();
+    res.json({ message: "user logged out Successfully!" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ err: "internal Server Error!" });
   }
 });
 
