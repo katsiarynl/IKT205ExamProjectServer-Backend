@@ -6,7 +6,9 @@ POST http://localhost:5000/signUp
 Content-Type: application/json
 
 {
-    "email": "katlool@uia.no",
+
+    "email": "knaan@uia.no",
+
     "password": "Password12@"
   
 }
@@ -20,4 +22,9 @@ Content-Type: application/json
     "email": "kats@uia.no",
     "password": "Password12@"
 }
- 
+
+
+### 
+POST http://localhost:5000/singOut
+
+
