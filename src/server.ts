@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import firebase from "firebase/compat/app";
 import { Restraunt } from "../schemas/restrauntModel";
-
+//https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
 import "firebase/compat/database";
 //import auth from "../firebaseconfig";
 // importing the auth from the main firebaseConfigPro
@@ -31,6 +31,7 @@ const PORT = process.env.PORT || 5000;
 const { Schema, model } = mongoose;
 
 import { Blog } from "../schemas/blogModel";
+import { ApplicationUser } from "../schemas/userModel";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
@@ -52,10 +53,16 @@ app.post("/signUp", async (req, res) => {
   }
   try {
     createUserWithEmailAndPassword(auth, email, password)
-      .then((newUserCredential) => {
+      .then(async (newUserCredential) => {
         const newUser = newUserCredential.user;
-        console.log(newUser);
-        res.json({ message: "User Registered Successfully" });
+        // console.log(newUser);
+        res.json({ message: "User Registered Successfully", id: newUser.uid });
+        const newAppUser = new ApplicationUser({
+          userId: newUser.uid,
+        });
+        console.log("user is");
+        console.log(newAppUser);
+        const insertedApplicationUser = await newAppUser.save();
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -80,7 +87,7 @@ app.post("/signIn", async (req, res) => {
       .then((existingUser) => {
         const user = existingUser.user;
         console.log(user);
-        res.json({ message: "User Signed In Successfully" });
+        res.json({ message: "User Signed In Successfully", userInf: user.uid });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -135,29 +142,6 @@ app.post("/v1/products", async (req, res) => {
   return res.status(200).json(product);
 });
 
-app.get("/create-checkout-session", async (req, res) => {
-  console.log("hello");
-  const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-
-        quantity: 1,
-
-        price: "price_1MjuErKZ0QuxsIgFG3P4dIkU",
-      },
-    ],
-    currency: "nok",
-    mode: "subscription",
-
-    success_url: `http://localhost:5000/success`,
-    cancel_url: `http://localhost:5000/cancel`,
-  });
-  const redirecturl = session.url || "http://localhost:5000";
-
-  return res.status(200).json(redirecturl);
-});
-
 app.post("/create-checkout-session", async (req, res) => {
   console.log(req.body);
 
@@ -208,23 +192,6 @@ app.post("/login", async (req, res) => {
     });
   res.redirect("/");
 });
-
-// app.use((req, res, next) => {
-//   const user = firebase.auth().currentUser;
-//   res.locals.currentUser = user;
-//   console.log(user);
-//   next();
-// });
-// app.get("/logout", function (req, res) {
-//   signOut(auth)
-//     .then(() => {
-//       res.redirect("/login");
-//     })
-//     .catch((error) => {
-//       // An error happened.
-//       throw error;
-//     });
-// });
 
 //GET request to localhost:5000/users
 app.get("/restraunts", async (req, res) => {
