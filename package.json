@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": "19.4.0",
-    "npm": "9.2.0"
+    "npm": "9.6.4"
   },
   "scripts": {
     "build": "rimraf ./build && tsc",
