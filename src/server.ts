@@ -12,26 +12,6 @@ import "firebase/compat/database";
 // importing the auth from the main firebaseConfigPro
 
 import { auth } from "../firebaseConfigPro";
-import admin from "firebase-admin";
-import serviceAccount from "../serviceAccount.json" assert { type: "json" };
-
-const params = {
-  type: serviceAccount.type,
-  projectId: serviceAccount.project_id,
-  privateKeyId: serviceAccount.private_key_id,
-  privateKey: serviceAccount.private_key,
-  clientEmail: serviceAccount.client_email,
-  clientId: serviceAccount.client_id,
-  authUri: serviceAccount.auth_uri,
-  tokenUri: serviceAccount.token_uri,
-  authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
-  clientC509CertUrl: serviceAccount.client_x509_cert_url,
-};
-
-admin.initializeApp({
-  credential: admin.credential.cert(params),
-  databaseURL: "https://cooktogo-cec09-default-rtdb.firebaseio.com",
-});
 
 // Initialize the Admin App
 // creating post api called isAuthenticated
@@ -94,32 +74,6 @@ app.post("/signUp", async (req, res) => {
       });
   } catch {
     res.status(500).json({ error: "internal server Error!" });
-  }
-});
-
-app.get("/isAuthenticated", async (req, res) => {
-  try {
-    // Check if Authorization header is present and in the expected format
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    // Extract the ID token from the Authorization header
-    const idToken = authHeader.split(" ")[1];
-
-    // Verify ID token and get user info
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const uid = decodedToken.uid;
-
-    // Return true if user is authenticated
-    res.json({ isAuthenticated: true });
-    console.log(idToken);
-  } catch (error) {
-    console.error(error);
-
-    // Return false if user is not authenticated
-    res.json({ isAuthenticated: false });
   }
 });
 
