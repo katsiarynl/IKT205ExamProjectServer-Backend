@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import firebase from "firebase/compat/app";
 import { Restraunt } from "../schemas/restrauntModel";
-
+import nodemailer from "nodemailer";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
 
 
@@ -262,6 +262,31 @@ app.post("/create-checkout-session", async (req, res) => {
   console.log(res);
   return res.status(200).json(redirecturl);
 });
+
+app.post("/nodemailer", async (req, res) => {
+  console.log("Email sender...");
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'fresh724fresh@gmail.com',
+      pass: 'dmvwhxvuzuscyfem'
+    }
+  });
+
+  let mailOptions = {
+    from: 'fresh724fresh@gmail.com',
+    to: 'yunusyilmaz6753@gmail.com',
+    subject: 'Payment Confirmation',
+    text: 'Your payment was successful!'
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Epost : ' + info.response);
+    }
+});});
 
 app.use("/success", async (req, res) => {
   console.log("login");
