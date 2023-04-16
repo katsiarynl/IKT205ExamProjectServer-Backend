@@ -12,6 +12,26 @@ import "firebase/compat/database";
 // importing the auth from the main firebaseConfigPro
 
 import { auth } from "../firebaseConfigPro";
+import admin from "firebase-admin";
+import serviceAccount from "../serviceAccount.json" assert { type: "json" };
+
+const params = {
+  type: serviceAccount.type,
+  projectId: serviceAccount.project_id,
+  privateKeyId: serviceAccount.private_key_id,
+  privateKey: serviceAccount.private_key,
+  clientEmail: serviceAccount.client_email,
+  clientId: serviceAccount.client_id,
+  authUri: serviceAccount.auth_uri,
+  tokenUri: serviceAccount.token_uri,
+  authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
+  clientC509CertUrl: serviceAccount.client_x509_cert_url,
+};
+
+admin.initializeApp({
+  credential: admin.credential.cert(params),
+  databaseURL: "https://cooktogo-cec09-default-rtdb.firebaseio.com",
+});
 
 // Initialize the Admin App
 // creating post api called isAuthenticated
@@ -26,6 +46,7 @@ const stripe = new Stripe(
 
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
@@ -52,7 +73,7 @@ const app = express();
 app.use(express.json());
 
 // creating the post request to /SignUp
-
+// https://firebase.google.com/docs/auth/web/email-link-auth
 app.post("/signUp", async (req, res) => {
   const { email, password } = req.body;
 
@@ -77,9 +98,64 @@ app.post("/signUp", async (req, res) => {
   }
 });
 
-//creating the isAuth
+app.get("/isAuthenticated", async (req, res) => {
+  try {
+    // Check if Authorization header is present and in the expected format
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
-// creating the sign in post with signIn
+    // Extract the ID token from the Authorization header
+    const idToken = authHeader.split(" ")[1];
+
+    // Verify ID token and get user info
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+
+    // Return true if user is authenticated
+    res.json({ isAuthenticated: true });
+    console.log(idToken);
+  } catch (error) {
+    console.error(error);
+
+    // Return false if user is not authenticated
+    res.json({ isAuthenticated: false });
+  }
+});
+
+// post request for the forgetPassword.
+// https://firebase.google.com/docs/auth/web/email-link-auth
+app.post("/forgetPassword", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ MessageError: "Email is required!" });
+  }
+  try {
+    const userExists = await admin.auth().getUserByEmail(email);
+    if (!userExists) {
+      return res
+        .status(404)
+        .json({ MessageError: "User not found for that user!" });
+    }
+    const linkToReset = {
+      // using our url passWord reset link, to be the link clickable.
+      url: "https://cooktogo-cec09.firebaseapp.com/__/auth/action?mode=action&oobCode=code",
+      handleCodeInApp: true,
+    };
+    await sendPasswordResetEmail(auth, email, linkToReset);
+    console.log("Password reset email sent successfully to: ", email);
+
+    res.json({
+      message: "Link for password rest sent email Successfully!",
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    res.status(400).json({ Error: error.message });
+  }
+});
 
 app.post("/signIn", async (req, res) => {
   const { email, password } = req.body;
@@ -122,7 +198,7 @@ app.post("/singOut", async (req, res) => {
     res.json({ message: "user logged out Successfully!" });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: "internal Server Error!" });
+    res.status(500).json({ err: "internal Server Error! " });
   }
 });
 
