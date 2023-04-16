@@ -50,6 +50,7 @@ const stripe = new Stripe(
 
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
@@ -79,7 +80,7 @@ const app = express();
 app.use(express.json());
 
 // creating the post request to /SignUp
-
+// https://firebase.google.com/docs/auth/web/email-link-auth
 app.post("/signUp", async (req, res) => {
   const { email, password } = req.body;
 
@@ -136,9 +137,38 @@ app.get("/isAuthenticated", async (req, res) => {
   }
 });
 
-//creating the isAuth
+// post request for the forgetPassword.
+// https://firebase.google.com/docs/auth/web/email-link-auth
+app.post("/forgetPassword", async (req, res) => {
+  const { email } = req.body;
 
-// creating the sign in post with signIn
+  if (!email) {
+    return res.status(400).json({ MessageError: "Email is required!" });
+  }
+  try {
+    const userExists = await admin.auth().getUserByEmail(email);
+    if (!userExists) {
+      return res
+        .status(404)
+        .json({ MessageError: "User not found for that user!" });
+    }
+    const linkToReset = {
+      // using our url passWord reset link, to be the link clickable.
+      url: "https://cooktogo-cec09.firebaseapp.com/__/auth/action?mode=action&oobCode=code",
+      handleCodeInApp: true,
+    };
+    await sendPasswordResetEmail(auth, email, linkToReset);
+    console.log("Password reset email sent successfully to: ", email);
+
+    res.json({
+      message: "Link for password rest sent email Successfully!",
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    res.status(400).json({ Error: error.message });
+  }
+});
 
 app.post("/signIn", async (req, res) => {
   const { email, password } = req.body;
@@ -183,7 +213,7 @@ app.post("/singOut", async (req, res) => {
     res.json({ message: "user logged out Successfully!" });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: "internal Server Error!" });
+    res.status(500).json({ err: "internal Server Error! " });
   }
 });
 
