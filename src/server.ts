@@ -1,7 +1,6 @@
-import express from "express";
+import express, { Express, Request, Response } from "express";
 import mongoose from "mongoose";
 import helmet from "helmet";
-import firebase from "firebase/compat/app";
 import { Restraunt } from "../schemas/restrauntModel";
 import nodemailer from "nodemailer";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
@@ -62,8 +61,7 @@ const { Schema, model } = mongoose;
 import { ApplicationUser } from "../schemas/userModel";
 
 import { ActivityIndicatorComponent } from "react-native";
-import { Server } from "http";
-import { async } from "@firebase/util";
+import { basicAuthCred } from "./types";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
@@ -71,14 +69,14 @@ import { async } from "@firebase/util";
 const uri =
   "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
-const app = express();
+const app: Express = express();
 app.use(helmet());
 app.use(express.json());
 
 // creating the post request to /SignUp
 // https://firebase.google.com/docs/auth/web/email-link-auth
-app.post("/signUp", async (req, res) => {
-  const { email, password } = req.body;
+app.post("/signUp", async (req: Request, res: Response) => {
+  const { email, password }: basicAuthCred = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required!" });
@@ -107,7 +105,7 @@ app.post("/signUp", async (req, res) => {
   }
 });
 
-app.get("/isAuthenticated", async (req, res) => {
+app.get("/isAuthenticated", async (req: Request, res: Response) => {
   try {
     // Check if Authorization header is present and in the expected format
     const authHeader = req.headers.authorization;
@@ -135,7 +133,7 @@ app.get("/isAuthenticated", async (req, res) => {
 
 // post request for the forgetPassword.
 // https://firebase.google.com/docs/auth/web/email-link-auth
-app.post("/forgetPassword", async (req, res) => {
+app.post("/forgetPassword", async (req: Request, res: Response) => {
   const { email } = req.body;
 
   if (!email) {
@@ -166,8 +164,8 @@ app.post("/forgetPassword", async (req, res) => {
   }
 });
 
-app.post("/signIn", async (req, res) => {
-  const { email, password } = req.body;
+app.post("/signIn", async (req: Request, res: Response) => {
+  const { email, password }: basicAuthCred = req.body;
 
   // checking if the user post without email and password
   if (!email || !password) {
@@ -201,7 +199,7 @@ app.post("/signIn", async (req, res) => {
 
 // post request for the Signout post
 
-app.post("/singOut", async (req, res) => {
+app.post("/singOut", async (_: Request, res: Response) => {
   try {
     await auth.signOut();
     res.json({ message: "user logged out Successfully!" });
@@ -213,7 +211,7 @@ app.post("/singOut", async (req, res) => {
 
 //POST localhost:5000/register
 //POST request to register
-app.post("/register", async (req, res) => {
+app.post("/register", async (_: Request, res: Response) => {
   try {
     createUserWithEmailAndPassword(
       auth,
@@ -226,9 +224,9 @@ app.post("/register", async (req, res) => {
         console.log(user);
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(error);
+        console.error(error.code);
+        console.error(error.message);
+        console.error(error);
       });
     res.redirect("/");
   } catch (e) {
@@ -236,30 +234,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/v1/prices", async (req, res) => {
-  //mongoose
-  const price = await stripe.prices.create({
-    unit_amount: 2000,
-    currency: "nok",
-    recurring: { interval: "month" },
-    product: "prod_NUu2RGsnPGeRN4",
-  });
-  return res.status(200).json(price);
-});
-app.post("/v1/products", async (req, res) => {
-  //mongoose
-  const product = await stripe.products.create({
-    name: "Gold NOT Special",
-  });
-  return res.status(200).json(product);
-});
-
-app.post("/create-checkout-session", async (req, res) => {
-  console.log(req.body);
-
-  console.log("--------------------");
-  req.body.map((item) => console.log(item.id));
-
+app.post("/create-checkout-session", async (req: Request, res: Response) => {
   const session = await stripe.checkout.sessions.create({
     line_items: req.body.map((item) => {
       return {
@@ -287,7 +262,7 @@ app.post("/create-checkout-session", async (req, res) => {
   return res.status(200).json(redirecturl);
 });
 
-app.post("/nodemailer", async (req, res) => {
+app.post("/nodemailer", async (req: Request, res: Response) => {
   console.log("Email sender...");
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -306,23 +281,26 @@ app.post("/nodemailer", async (req, res) => {
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
+      console.error(error);
+      return res.status(400).json({ Error: "Email error, could not be sent" });
     } else {
       console.log("Epost : " + info.response);
     }
   });
+  return res.status(200).json(mailOptions);
 });
 
-app.use("/success", async (req, res) => {
+app.use("/success", async (_, res: Response) => {
   console.log("login");
   return res.status(200);
 });
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+app.post("/login", async (req: Request, res: Response) => {
+  const { email, password }: basicAuthCred = req.body;
   console.log("login");
 
   signInWithEmailAndPassword(auth, "kate@nedenes.com", "katepassword22222")
     .then((userCredential) => {
+      // todo: complite this
       const user = userCredential.user;
     })
     .catch((error) => {
@@ -332,7 +310,7 @@ app.post("/login", async (req, res) => {
 });
 
 //GET request to localhost:5000/users
-app.get("/restraunts", async (req, res) => {
+app.get("/restraunts", async (_, res: Response) => {
   //mongoose
   const allRestraunts = await Restraunt.find();
   console.log(allRestraunts);
@@ -340,14 +318,13 @@ app.get("/restraunts", async (req, res) => {
 });
 
 //GET request. path: localhost:5000/users/
-app.get("/restraunt/:id", async (req, res) => {
+app.get("/restraunt/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   const restraunt = await Restraunt.findById(id);
   return res.status(200).json(restraunt);
 });
 
-app.post("/restraunts/", async (req, res) => {
-  console.log("hello");
+app.post("/restraunts/", async (_, res: Response) => {
   const newRestraunt = new Restraunt({
     name: "String",
     address: "String",
@@ -386,5 +363,9 @@ const start = async () => {
     process.exit(1);
   }
 };
+
+app.use((_: Request, res: Response) => {
+  res.status(404).send(" mongodb");
+});
 
 start();
