@@ -6,8 +6,10 @@
     "strict": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "module": "es6",
-    "target": "es5"
+    "module": "esnext",
+    "target": "es2017",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   },
   "ts-node": {
     "esm": true,

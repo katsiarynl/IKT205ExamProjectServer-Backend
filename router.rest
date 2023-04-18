@@ -1,0 +1,48 @@
+GET  http://localhost:5000
+
+
+###
+POST http://localhost:5000/signUp
+Content-Type: application/json
+
+{
+
+
+
+    "email": "knaan@uia.no",
+
+
+    "password": "Password12@"
+  
+}
+
+###
+
+POST http://localhost:5000/signIn
+Content-Type: application/json
+
+{
+    "email": "kats@uia.no",
+    "password": "Password12@"
+}
+
+
+### 
+POST http://localhost:5000/singOut
+Content-Type: application/json
+
+{
+    "email": "knaan@uia.no",
+    "password": "Password12@"
+}
+
+### 
+POST http://localhost:5000/forgetPassword
+Content-Type: application/json
+
+{
+    "email": "mohamedzekaria@gmail.com"
+    
+}
+
+
