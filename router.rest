@@ -16,15 +16,18 @@ Content-Type: application/json
   
 }
 
+
 ###
 
-POST http://localhost:5000/signIn
+POST http://localhost:5000/image
 Content-Type: application/json
 
 {
-    "email": "kats@uia.no",
-    "password": "Password12@"
+    "path": "gs://cooktogo-cec09.appspot.com/image17.jpg"
+   
 }
+
+
 
 
 ### 
