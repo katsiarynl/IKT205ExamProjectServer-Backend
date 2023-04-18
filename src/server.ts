@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import { Restraunt } from "../schemas/restrauntModel";
 import nodemailer from "nodemailer";
+import { storage } from "../firebaseConfigPro";
+import { getDownloadURL, ref } from "firebase/storage";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
 
 import jwt from "jsonwebtoken";
@@ -102,6 +104,16 @@ app.post("/signUp", async (req: Request, res: Response) => {
       });
   } catch {
     res.status(500).json({ error: "internal server Error!" });
+  }
+});
+app.post("/image", async (req: Request, res: Response) => {
+  const { path }: { path: string } = req.body;
+  try {
+    const url = await getDownloadURL(ref(storage, path));
+
+    return res.status(200).json(url);
+  } catch (error) {
+    console.error(error);
   }
 });
 
