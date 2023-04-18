@@ -6,10 +6,8 @@ import { Restraunt } from "../schemas/restrauntModel";
 import nodemailer from "nodemailer";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
 
-
 import jwt from "jsonwebtoken";
 import { initializeApp } from "firebase-admin";
-
 
 import "firebase/compat/database";
 //import auth from "../firebaseconfig";
@@ -60,8 +58,6 @@ const PORT = process.env.PORT || 5000;
 
 const { Schema, model } = mongoose;
 
-import { Blog } from "../schemas/blogModel";
-
 import { ApplicationUser } from "../schemas/userModel";
 
 import { ActivityIndicatorComponent } from "react-native";
@@ -75,7 +71,7 @@ const uri =
   "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
 const app = express();
-//app.use(helmet());
+app.use(helmet());
 app.use(express.json());
 
 // creating the post request to /SignUp
@@ -154,7 +150,6 @@ app.post("/signIn", async (req, res) => {
         const user = existingUser.user;
         console.log(user);
 
-
         const idToken = await user.getIdToken();
         console.log(idToken);
 
@@ -162,7 +157,6 @@ app.post("/signIn", async (req, res) => {
           accessToken: idToken,
           message: "User Signed In Successfully",
         });
-
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -265,28 +259,29 @@ app.post("/create-checkout-session", async (req, res) => {
 
 app.post("/nodemailer", async (req, res) => {
   console.log("Email sender...");
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
     auth: {
-      user: 'fresh724fresh@gmail.com',
-      pass: 'dmvwhxvuzuscyfem'
-    }
+      user: "cook2goo@gmail.com",
+      pass: "bcppfbtcashrfalc",
+    },
   });
 
-  let mailOptions = {
-    from: 'fresh724fresh@gmail.com',
-    to: 'yunusyilmaz6753@gmail.com',
-    subject: 'Payment Confirmation',
-    text: 'Your payment was successful!'
+  const mailOptions = {
+    from: "cook2goo@gmail.com",
+    to: "lobkovskaya@icloud.com",
+    subject: "Payment Confirmation",
+    text: "Dear customer, payment was successful! Order details:",
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
-      console.log('Epost : ' + info.response);
+      console.log("Epost : " + info.response);
     }
-});});
+  });
+});
 
 app.use("/success", async (req, res) => {
   console.log("login");
@@ -321,13 +316,6 @@ app.get("/restraunt/:id", async (req, res) => {
   return res.status(200).json(restraunt);
 });
 
-//DELETE request. path: localhost:5000/users/
-app.delete("/blogs/:id", async (req, res) => {
-  const { id } = req.params;
-  const deleteBlog = await Blog.findByIdAndDelete(id);
-  return res.status(200).json(deleteBlog);
-});
-
 app.post("/restraunts/", async (req, res) => {
   console.log("hello");
   const newRestraunt = new Restraunt({
@@ -355,38 +343,6 @@ app.post("/restraunts/", async (req, res) => {
   });
   const insertedRestraunt = await newRestraunt.save();
   return res.status(201).json(insertedRestraunt);
-});
-
-app.put("/blogs/:id", async (req, res) => {
-  const { id } = req.params;
-  // console.log(req.body);
-  const InsertedBlog = new Blog({
-    title: "String",
-    slug: "String",
-    published: "Boolean",
-    author: "String",
-    content: "String",
-  });
-
-  await Blog.findByIdAndUpdate(id, req.body);
-  //await Blog.findByIdAndUpdate(id, { InsertedBlog });
-  const updatedBlog = await Blog.findById(id);
-  console.log(updatedBlog);
-  return res.status(200).json(updatedBlog);
-});
-//respond when smth is updated
-app.get("/update", async (req, res) => {
-  //mongoose
-  Blog.watch().on("change", async (data) => {
-    console.log(data);
-
-    const allBlogs = await Blog.find();
-    console.log(allBlogs);
-    return res.status(200).json(allBlogs);
-  });
-});
-app.use((req, res, next) => {
-  res.status(404).send(" mongodb");
 });
 
 const start = async () => {
