@@ -274,9 +274,11 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
     const redirecturl = session.url || "http://localhost:5000";
     console.log(res);
     return res.status(200).json(redirecturl);
-  } catch {
+  } catch (error) {
     console.error(error);
-    return res.status(404);
+    console.log("catched");
+
+    res.status(400).json({ error: "Invalid parameters" });
   }
 });
 
