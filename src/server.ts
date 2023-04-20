@@ -64,6 +64,7 @@ import { ApplicationUser } from "../schemas/userModel";
 
 import { ActivityIndicatorComponent } from "react-native";
 import { basicAuthCred } from "./types";
+import { error } from "console";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
@@ -247,31 +248,36 @@ app.post("/register", async (_: Request, res: Response) => {
 });
 
 app.post("/create-checkout-session", async (req: Request, res: Response) => {
-  const session = await stripe.checkout.sessions.create({
-    line_items: req.body.map((item) => {
-      return {
-        price_data: {
-          currency: "nok",
-          product_data: {
-            name: item.name,
+  try {
+    const session = await stripe.checkout.sessions.create({
+      line_items: req.body.map((item) => {
+        return {
+          price_data: {
+            currency: "nok",
+            product_data: {
+              name: item.name,
+            },
+            unit_amount: item.price * 100,
           },
-          unit_amount: item.price * 100,
-        },
-        quantity: item.cartQuantity,
-      };
-    }),
+          quantity: item.cartQuantity,
+        };
+      }),
 
-    // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-    // invoice_creation: { enabled: true },
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      // invoice_creation: { enabled: true },
 
-    currency: "nok",
-    mode: "payment",
-    success_url: `http://localhost:5000/success`,
-    cancel_url: `http://localhost:5000/cancel`,
-  });
-  const redirecturl = session.url || "http://localhost:5000";
-  console.log(res);
-  return res.status(200).json(redirecturl);
+      currency: "nok",
+      mode: "payment",
+      success_url: `http://localhost:5000/success`,
+      cancel_url: `http://localhost:5000/cancel`,
+    });
+    const redirecturl = session.url || "http://localhost:5000";
+    console.log(res);
+    return res.status(200).json(redirecturl);
+  } catch {
+    console.error(error);
+    return res.status(404);
+  }
 });
 
 app.post("/nodemailer", async (req: Request, res: Response) => {
