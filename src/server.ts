@@ -13,6 +13,7 @@ import "firebase/compat/database";
 
 import { auth } from "../firebaseConfigPro";
 import admin from "firebase-admin";
+// @ts-ignore
 import serviceAccount from "../serviceAccount.json" assert { type: "json" };
 
 const params = {
@@ -68,7 +69,7 @@ import { error } from "console";
 const uri =
   "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
-const app: Express = express();
+export const app: Express = express();
 app.use(helmet());
 app.use(express.json());
 
