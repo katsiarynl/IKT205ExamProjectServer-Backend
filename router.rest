@@ -2,7 +2,7 @@ GET  http://localhost:5000
 
 
 ###
-POST http://localhost:5000/create-checkout-session
+POST https://cook2go.herokuapp.com/create-checkout-session
 Content-Type: application/json
 
 [{
