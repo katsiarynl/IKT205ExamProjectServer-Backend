@@ -26,7 +26,7 @@
       "^.+\\.(js|jsx)$": "babel-jest"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|expo-status-bar|react-native-chart-kit|react-native)"
+      "node_modules/(?!@react-native|react-native)"
     ],
     "globals": {
       "__DEV__": true
@@ -45,9 +45,6 @@
     "moduleDirectories": [
       "node_modules",
       "src"
-    ],
-    "setupFiles": [
-      "./node_modules/react-native/jest/setup.js"
     ]
   },
   "dependencies": {
@@ -67,17 +64,15 @@
     "jwt-decode": "^3.1.2",
     "mongoose": "^7.0.3",
     "nodemailer": "^6.9.1",
-    "react": "18.2.0",
-    "react-native": "0.71.3",
-    "react-test-renderer": "^18.2.0",
     "stripe": "^11.18.0",
     "ts-jest": "^29.0.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
     "@types/express": "^4.17.17",
     "@types/node": "^18.14.6",
-    "@types/react": "~18.0.14",
     "@types/stripe": "^8.0.417",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",

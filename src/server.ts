@@ -7,9 +7,6 @@ import { storage } from "../firebaseConfigPro";
 import { getDownloadURL, ref } from "firebase/storage";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
 
-import jwt from "jsonwebtoken";
-import { initializeApp } from "firebase-admin";
-
 import "firebase/compat/database";
 //import auth from "../firebaseconfig";
 // importing the auth from the main firebaseConfigPro
@@ -62,7 +59,6 @@ const { Schema, model } = mongoose;
 
 import { ApplicationUser } from "../schemas/userModel";
 
-import { ActivityIndicatorComponent } from "react-native";
 import { basicAuthCred } from "./types";
 import { error } from "console";
 

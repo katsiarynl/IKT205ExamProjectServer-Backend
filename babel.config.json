@@ -1,0 +1,14 @@
+/* eslint-disable no-undef */
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current"
+        }
+      }
+    ],
+    "@babel/preset-typescript"
+  ]
+}
