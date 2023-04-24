@@ -13,6 +13,7 @@ import "firebase/compat/database";
 
 import { auth } from "../firebaseConfigPro";
 import admin from "firebase-admin";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import serviceAccount from "../serviceAccount.json" assert { type: "json" };
 
@@ -189,10 +190,13 @@ app.post("/signIn", async (req: Request, res: Response) => {
         console.log(user);
 
         const idToken = await user.getIdToken();
+        const userName = user.email;
+
         console.log(idToken);
 
         res.json({
           accessToken: idToken,
+          userEmail: userName,
           message: "User Signed In Successfully",
         });
       })
