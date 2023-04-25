@@ -326,6 +326,8 @@ app.post("/login", async (req: Request, res: Response) => {
   res.redirect("/");
 });
 
+
+
 //GET request to localhost:5000/users
 app.get("/restraunts", async (_, res: Response) => {
   //mongoose
@@ -372,8 +374,8 @@ app.post("/restraunts/", async (_, res: Response) => {
 const start = async () => {
   try {
     await mongoose.connect(uri);
-    app.listen(PORT, () => {
-      console.log("listening on " + PORT);
+    app.listen(PORT, async () => {
+      await console.log("listening on " + PORT);
     });
   } catch (error) {
     console.error(error);
@@ -386,3 +388,4 @@ app.use((_: Request, res: Response) => {
 });
 
 start();
+
