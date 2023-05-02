@@ -163,6 +163,30 @@ app.post("/forgetPassword", async (req: Request, res: Response) => {
     res.status(400).json({ Error: error.message });
   }
 });
+app.post("/postrestaurant", async (req: Request, res: Response) => {
+  console.log(req.body)
+ 
+  const newRestraunt = new Restraunt({
+    name: req.body.restaurant,
+    address: req.body.address,
+    rating: req.body.rating,
+    photos: req.body.photos,
+    
+    menu: [
+      {
+        category: req.body.category,
+        meals: [
+          { name: req.body.named, price: req.body.price, description: req.body.descrpt },
+          { name: req.body.named1, price: req.body.price1, description: req.body.descrption1 },
+        ],
+      },
+    
+    ],
+  });
+  const insertedRestraunt = await newRestraunt.save();
+  return res.status(201).json(insertedRestraunt);
+
+});
 
 app.post("/signIn", async (req: Request, res: Response) => {
   const { email, password }: basicAuthCred = req.body;
@@ -315,6 +339,13 @@ app.get("/restraunts", async (_, res: Response) => {
   const allRestraunts = await Restraunt.find();
   console.log(allRestraunts);
   return res.status(200).json(allRestraunts);
+});
+
+app.get("/doris", async (_, res: Response) => {
+  //mongoose
+ console.log("Doris")
+ 
+ return res.status(200).send("hello ")
 });
 
 //GET request. path: localhost:5000/users/
