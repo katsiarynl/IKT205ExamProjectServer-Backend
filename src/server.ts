@@ -372,6 +372,39 @@ app.post("/restraunts/", async (_, res: Response) => {
   const insertedRestraunt = await newRestraunt.save();
   return res.status(201).json(insertedRestraunt);
 });
+app.post('/users', async (req, res) => {
+  try {
+    const user = new ApplicationUser(req.body);
+    await user.save();
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+app.get('/users/:email', async (req, res) => {
+  try {
+    const user = await ApplicationUser.findOne({ email: req.params.email });
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.put('/users/:email', async (req, res) => {
+  try {
+    const user = await ApplicationUser.findOneAndUpdate({ email: req.params.email }, req.body, { new: true });
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 const start = async () => {
   try {
