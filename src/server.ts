@@ -332,47 +332,59 @@ app.post("/login", async (req: Request, res: Response) => {
 
 //GET request to localhost:5000/users
 app.get("/restraunts", async (_, res: Response) => {
-  //mongoose
-  const allRestraunts = await Restraunt.find();
-  console.log(allRestraunts);
-  return res.status(200).json(allRestraunts);
+  try {
+    //mongoose
+    const allRestraunts = await Restraunt.find();
+    console.log(allRestraunts);
+    return res.status(200).json(allRestraunts);
+  } catch (error) {
+    return res.status(400).send({ error: "Error occured" });
+  }
 });
 
 //GET request. path: localhost:5000/users/
 app.get("/restraunt/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const restraunt = await Restraunt.findById(id);
-  return res.status(200).json(restraunt);
+  try {
+    const { id } = req.params;
+    const restraunt = await Restraunt.findById(id);
+    return res.status(200).json(restraunt);
+  } catch (error) {
+    return res.status(400).send({ error: "Error occured" });
+  }
 });
 
 app.post("/restraunts/", async (_, res: Response) => {
-  const newRestraunt = new Restraunt({
-    name: "String",
-    address: "String",
-    rating: 5,
-    photos:
-      "https://www.foodiesfeed.com/wp-content/uploads/2019/06/top-view-for-box-of-2-burgers-home-made-600x899.jpg",
-    menu: [
-      {
-        category: "category1",
-        meals: [
-          { name: "String", price: 24, description: "String" },
-          { name: "String1", price: 21, description: "String1" },
-        ],
-      },
-      {
-        category: "category1",
-        meals: [
-          { name: "String", price: 22, description: "String" },
-          { name: "String1", price: 33, description: "String1" },
-        ],
-      },
-    ],
-  });
-  const insertedRestraunt = await newRestraunt.save();
-  return res.status(201).json(insertedRestraunt);
+  try {
+    const newRestraunt = new Restraunt({
+      name: "String",
+      address: "String",
+      rating: 5,
+      photos:
+        "https://www.foodiesfeed.com/wp-content/uploads/2019/06/top-view-for-box-of-2-burgers-home-made-600x899.jpg",
+      menu: [
+        {
+          category: "category1",
+          meals: [
+            { name: "String", price: 24, description: "String" },
+            { name: "String1", price: 21, description: "String1" },
+          ],
+        },
+        {
+          category: "category1",
+          meals: [
+            { name: "String", price: 22, description: "String" },
+            { name: "String1", price: 33, description: "String1" },
+          ],
+        },
+      ],
+    });
+    const insertedRestraunt = await newRestraunt.save();
+    return res.status(201).json(insertedRestraunt);
+  } catch (error) {
+    return res.status(400).send({ error: "Error occured" });
+  }
 });
-app.post('/users', async (req, res) => {
+app.post("/users", async (req, res) => {
   try {
     const user = new ApplicationUser(req.body);
     await user.save();
@@ -382,11 +394,11 @@ app.post('/users', async (req, res) => {
   }
 });
 
-app.get('/users/:email', async (req, res) => {
+app.get("/users/:email", async (req, res) => {
   try {
     const user = await ApplicationUser.findOne({ email: req.params.email });
     if (!user) {
-      return res.status(404).send({ error: 'User not found' });
+      return res.status(404).send({ error: "User not found" });
     }
     res.send(user);
   } catch (error) {
@@ -394,11 +406,15 @@ app.get('/users/:email', async (req, res) => {
   }
 });
 
-app.put('/users/:email', async (req, res) => {
+app.put("/users/:email", async (req, res) => {
   try {
-    const user = await ApplicationUser.findOneAndUpdate({ email: req.params.email }, req.body, { new: true });
+    const user = await ApplicationUser.findOneAndUpdate(
+      { email: req.params.email },
+      req.body,
+      { new: true }
+    );
     if (!user) {
-      return res.status(404).send({ error: 'User not found' });
+      return res.status(404).send({ error: "User not found" });
     }
     res.send(user);
   } catch (error) {
