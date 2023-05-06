@@ -407,18 +407,42 @@ app.get("/users/:email", async (req, res) => {
 });
 
 app.put("/users/:email", async (req, res) => {
+  const filter = { userId: "YZU5Go5XQYQV4ZjfJcM4mY8XVFo1" };
   try {
-    const user = await ApplicationUser.findOneAndUpdate(
-      { email: req.params.email },
-      req.body,
-      { new: true }
-    );
+    console.log("hello");
+    // const user = await ApplicationUser.findOneAndUpdate(req.body, {
+    //   new: true,
+    // });
+    const user = await ApplicationUser.findOne({
+      userId: "YZU5Go5XQYQV4ZjfJcM4mY8XVFo1",
+    });
     if (!user) {
+      console.log("404");
+      console.log(req.params.email);
+      console.log(req.body);
+      // const newUserWithOrder = new ApplicationUser({
+      //   userId: "testtttt",
+      //   // addressLine1: "testaddress",
+      //   orders: { test: "test" },
+      //   email: "email",
+      // });
+
+      // console.log("I am here");
+      // await newUserWithOrder.save();
+
       return res.status(404).send({ error: "User not found" });
+    } else {
+      const test = await ApplicationUser.updateOne(filter, {
+        email: "heyheyhey",
+        orders: [...user.orders, { test: "testik" }],
+      });
+      user.save;
+      console.log("Exists");
     }
     res.send(user);
   } catch (error) {
     res.status(500).send(error);
+    console.log("hello");
   }
 });
 
