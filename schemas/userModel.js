@@ -9,6 +9,7 @@ const userSchema = new Schema({
   city: String,
   state: String,
   zipCode: String,
+  orders: Array,
 });
 
 const ApplicationUser = model("ApplicationUser", userSchema);
