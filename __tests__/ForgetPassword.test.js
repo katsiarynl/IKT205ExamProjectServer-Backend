@@ -13,10 +13,12 @@ describe("POST /forgetPassword endpoint", () => {
     const response = await request(app)
       .post("/forgetPassword")
       .send({ email: "yunus@example.com" });
-      console.log(response.statusCode);
+
     expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("Error");
-    expect(response.body.Error).toBe("There is no user record corresponding to the provided identifier.");
+    expect(response.body.Error).toBe(
+      "There is no user record corresponding to the provided identifier."
+    );
   });
 
   test("It should return a success message and status 200 if email is valid", async () => {
@@ -29,5 +31,4 @@ describe("POST /forgetPassword endpoint", () => {
       "Link for password rest sent email Successfully!"
     );
   });
-
 });
