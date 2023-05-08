@@ -394,55 +394,54 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.get("/users/:email", async (req, res) => {
+app.get("/users/:id", async (req, res) => {
   try {
-    const user = await ApplicationUser.findOne({ email: req.params.email });
+    const user = await ApplicationUser.findOne({ userId: req.params.id });
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
+    console.log("here");
+    console.log(user);
     res.send(user);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-app.put("/users/:email", async (req, res) => {
-  const filter = { userId: "YZU5Go5XQYQV4ZjfJcM4mY8XVFo1" };
+app.put("/users/:id", async (req, res) => {
+  const filter = { userId: req.body.data.email };
+  const date = new Date();
+  //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
+  const appended_date = {
+    date: date.toLocaleDateString("en-US"),
+    orderdetails: req.body.data.ordered_dishes,
+  };
+
   try {
-    console.log("hello");
     // const user = await ApplicationUser.findOneAndUpdate(req.body, {
     //   new: true,
     // });
-    const user = await ApplicationUser.findOne({
-      userId: "YZU5Go5XQYQV4ZjfJcM4mY8XVFo1",
-    });
+    const user = await ApplicationUser.findOne(filter);
     if (!user) {
-      console.log("404");
-      console.log(req.params.email);
-      console.log(req.body);
-      // const newUserWithOrder = new ApplicationUser({
-      //   userId: "testtttt",
-      //   // addressLine1: "testaddress",
-      //   orders: { test: "test" },
-      //   email: "email",
-      // });
+      const newUserWithOrder = new ApplicationUser({
+        userId: req.body.data.email,
+        // addressLine1: "testaddress",
+        orders: [appended_date],
+        email: req.body.data.email,
+      });
 
-      // console.log("I am here");
-      // await newUserWithOrder.save();
-
-      return res.status(404).send({ error: "User not found" });
+      await newUserWithOrder.save();
+      return res.status(200).send({ newUserWithOrder });
     } else {
       const test = await ApplicationUser.updateOne(filter, {
-        email: "heyheyhey",
-        orders: [...user.orders, { test: "testik" }],
+        email: req.body.data.email,
+        orders: [...user.orders, appended_date],
       });
       user.save;
-      console.log("Exists");
     }
-    res.send(user);
+    res.status(200).send(user);
   } catch (error) {
     res.status(500).send(error);
-    console.log("hello");
   }
 });
 
