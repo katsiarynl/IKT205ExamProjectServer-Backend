@@ -412,7 +412,7 @@ app.get("/users/:id", async (req, res) => {
   try {
     const user = await ApplicationUser.findOne({ userId: req.params.id });
     if (!user) {
-      return res.status(404).send({ error: "User not found" });
+      return res.send([]);
     }
 
     if (
