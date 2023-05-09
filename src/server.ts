@@ -16,7 +16,7 @@ import admin from "firebase-admin";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import serviceAccount from "../serviceAccount.json" assert { type: "json" };
-
+//params
 const params = {
   type: serviceAccount.type,
   projectId: serviceAccount.project_id,
@@ -91,8 +91,7 @@ app.post("/signUp", async (req: Request, res: Response) => {
         const newAppUser = new ApplicationUser({
           userId: newUser.uid,
         });
-        console.log("user is");
-        console.log(newAppUser);
+
         const insertedApplicationUser = await newAppUser.save();
       })
       .catch((error) => {
@@ -133,7 +132,6 @@ app.get("/isAuthenticated", async (req: Request, res: Response) => {
 
     // Return true if user is authenticated
     res.json({ isAuthenticated: true });
-    console.log(idToken);
   } catch (error) {
     console.error(error);
 
@@ -283,8 +281,7 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/nodemailer", async (req: Request, res: Response) => {
-  console.log("Email sender...");
+app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -293,22 +290,39 @@ app.post("/nodemailer", async (req: Request, res: Response) => {
     },
   });
 
-  const mailOptions = {
-    from: "cook2goo@gmail.com",
-    to: "lobkovskaya@icloud.com",
-    subject: "Payment Confirmation",
-    text: "Dear customer, payment was successful! Order details:",
-  };
+  const items = req.body.data.map(
+    (item) =>
+      `Name: ${item.name}  Price: ${item.price} Quantity: ${item.cartQuantity}, \n`
+  );
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.error(error);
-      return res.status(400).json({ Error: "Email error, could not be sent" });
-    } else {
-      console.log("Epost : " + info.response);
-    }
-  });
-  return res.status(200).json(mailOptions);
+  try {
+    const mailOptions = {
+      from: "cook2goo@gmail.com",
+      to: req.params.mail,
+      subject: "Payment Confirmation",
+      text:
+        "Dear Customer, payment was successful!" +
+        "\n" +
+        "Order details:" +
+        "\n" +
+        items,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.error(error);
+        return res
+          .status(400)
+          .json({ Error: "Email error, could not be sent" });
+      } else {
+        console.log("Epost : " + info.response);
+      }
+    });
+    return res.status(200).json(mailOptions);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: "Invalid parameters" });
+  }
 });
 
 app.use("/success", async (_, res: Response) => {
