@@ -292,9 +292,7 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
 
   const items = req.body.data.map(
     (item) =>
-      `Name: ${item.name}  Price: ${item.price * 100} Quantity: ${
-        item.cartQuantity
-      }, \n`
+      `Name: ${item.name}  Price: ${item.price} Quantity: ${item.cartQuantity}, \n`
   );
 
   try {
