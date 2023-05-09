@@ -290,12 +290,11 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
     },
   });
 
-  const items = req.body.data.map(
-    (item) =>
-      `Name: ${item.name}  Price: ${item.price} Quantity: ${item.cartQuantity}, \n`
-  );
-
   try {
+    const items = req.body.data.map(
+      (item) =>
+        `Name: ${item.name}  Price: ${item.price} Quantity: ${item.cartQuantity}, \n`
+    );
     const mailOptions = {
       from: "cook2goo@gmail.com",
       to: req.params.mail,
@@ -412,7 +411,7 @@ app.get("/users/:id", async (req, res) => {
   try {
     const user = await ApplicationUser.findOne({ userId: req.params.id });
     if (!user) {
-      return res.status(404).send({ error: "User not found" });
+      return res.send([]);
     }
 
     if (
