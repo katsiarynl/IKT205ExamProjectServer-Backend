@@ -414,9 +414,16 @@ app.get("/users/:id", async (req, res) => {
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
-    console.log("here");
-    console.log(user);
-    res.send(user);
+
+    if (
+      user.orders == undefined ||
+      user.orders.length == 0 ||
+      user.orders.length == null
+    ) {
+      res.send([]);
+    } else {
+      res.send(user);
+    }
   } catch (error) {
     res.status(500).send(error);
   }
