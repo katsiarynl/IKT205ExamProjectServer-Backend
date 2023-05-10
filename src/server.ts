@@ -294,12 +294,11 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
     },
   });
   //https://stackoverflow.com/questions/45812160/unexpected-comma-using-map
-
   try {
     const items = req.body.data
       .map(
         (item) =>
-          `Name: ${item.name};  Price: ${item.price}; Quantity: ${item.cartQuantity}. \n`
+          `Name: ${item.name};  Price: ${item.price} NOK; Quantity: ${item.cartQuantity}. \n`
       )
       .join("");
     const mailOptions = {
