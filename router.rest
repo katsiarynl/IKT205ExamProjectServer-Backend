@@ -29,12 +29,12 @@ Content-Type: application/json
 
 
 ### 
-POST http://localhost:5000/signIn
+POST http://localhost:5000/signUp
 Content-Type: application/json
 
 {
-    "email": "lobkovskaya@icloud.com",
-    "password": "1234567890"
+    "email": "lsk@icloud.com",
+    "password": "1234789mmm0"
 }
 ### 
 POST http://localhost:5000/singOut
