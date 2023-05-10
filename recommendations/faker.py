@@ -49,10 +49,13 @@ for i in range (1,41):
     
 
 #generate the fake data
-for i in range(4):
+for i in range(10):
     category=fake.ethnic_category()
+    category1=fake.ethnic_category()
     rest_name = category +" Resturant"
     description = fake.sentence(ext_word_list=my_word_list)
+    description3 = fake.sentence(ext_word_list=my_word_list)
+    description4 = fake.sentence(ext_word_list=my_word_list)
     address= fake.address()
     rating = fake.random_number(digits = 1)
     #for photo
@@ -62,6 +65,10 @@ for i in range(4):
     price1=random.randint(50,700)
     dish2=fake.dish()
     price2=random.randint(100,700)
+    dish3=fake.dish()
+    price3=random.randint(100,700)
+    dish4=fake.dish()
+    price4=random.randint(100,700)
     description1= fake.sentence(ext_word_list=my_word_list)
     description2= fake.sentence(ext_word_list=my_word_list)
     #post the info
@@ -69,8 +76,8 @@ for i in range(4):
     
     myobj = {'restaurant': rest_name, 'description': description, "address": address,
                "rating": rating, "photos": photo,
-          "category": category, "named": dish1, "price": price1, "descrpt": description1, 
-           "named1": dish2, "price1": price2, "descrption1": description2 }
+          "category": category,"category1":category1, "named": dish1, "price": price1, "descrpt": description1, 
+           "named1": dish2, "price1": price2, "descrption1": description2, "price3": price3, "price4": price4, "dish3": dish3, "description3": description3, "description4": description4 }
     x = requests.post(url, json = myobj)
 
 
