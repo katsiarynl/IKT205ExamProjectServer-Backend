@@ -401,6 +401,48 @@ app.post("/restraunts/", async (_, res: Response) => {
     return res.status(400).send({ error: "Error occured" });
   }
 });
+///
+
+//POST request. path: localhost:5000/users/
+
+app.post("/user", async (req, res) => {
+  try {
+    const user = new ApplicationUser(req.body);
+    await user.save();
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+app.get("/user/:email", async (req, res) => {
+  try {
+    const user = await ApplicationUser.findOne({ email: req.params.email });
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.put("/user/:email", async (req, res) => {
+  try {
+    const user = await ApplicationUser.findOneAndUpdate(
+      { email: req.params.email },
+      req.body,
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 app.post("/users", async (req, res) => {
   try {
     const user = new ApplicationUser(req.body);
