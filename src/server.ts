@@ -86,13 +86,22 @@ app.post("/signUp", async (req: Request, res: Response) => {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (newUserCredential) => {
         const newUser = newUserCredential.user;
-        // console.log(newUser);
-        res.json({ message: "User Registered Successfully", id: newUser.uid });
-        const newAppUser = new ApplicationUser({
-          userId: newUser.uid,
-        });
+        const filter = { userId: newUser.email };
+        const user = await ApplicationUser.findOne(filter);
 
-        const insertedApplicationUser = await newAppUser.save();
+        const newAppUser = new ApplicationUser({
+          userId: newUser.email,
+        });
+        if (!user) {
+          await newAppUser.save();
+        } else {
+          await ApplicationUser.deleteOne(filter);
+          await newAppUser.save();
+        }
+        res.json({
+          message: "User Registered Successfully",
+          id: newUser.email,
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -185,13 +194,8 @@ app.post("/signIn", async (req: Request, res: Response) => {
     signInWithEmailAndPassword(auth, email, password)
       .then(async (existingUser) => {
         const user = existingUser.user;
-        console.log(user);
-
         const idToken = await user.getIdToken();
         const userName = user.email;
-
-        console.log(idToken);
-
         res.json({
           accessToken: idToken,
           userEmail: userName,
