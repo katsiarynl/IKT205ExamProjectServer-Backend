@@ -3,10 +3,9 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import { Restraunt } from "../schemas/restrauntModel";
 import nodemailer from "nodemailer";
+import { storage } from "../firebaseConfigPro";
+import { getDownloadURL, ref } from "firebase/storage";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
-
-import jwt from "jsonwebtoken";
-import { initializeApp } from "firebase-admin";
 
 import "firebase/compat/database";
 //import auth from "../firebaseconfig";
@@ -14,8 +13,10 @@ import "firebase/compat/database";
 
 import { auth } from "../firebaseConfigPro";
 import admin from "firebase-admin";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import serviceAccount from "../serviceAccount.json" assert { type: "json" };
-
+//params
 const params = {
   type: serviceAccount.type,
   projectId: serviceAccount.project_id,
@@ -60,8 +61,8 @@ const { Schema, model } = mongoose;
 
 import { ApplicationUser } from "../schemas/userModel";
 
-import { ActivityIndicatorComponent } from "react-native";
 import { basicAuthCred } from "./types";
+import { error } from "console";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
@@ -69,7 +70,7 @@ import { basicAuthCred } from "./types";
 const uri =
   "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
-const app: Express = express();
+export const app: Express = express();
 app.use(helmet());
 app.use(express.json());
 
@@ -90,8 +91,7 @@ app.post("/signUp", async (req: Request, res: Response) => {
         const newAppUser = new ApplicationUser({
           userId: newUser.uid,
         });
-        console.log("user is");
-        console.log(newAppUser);
+
         const insertedApplicationUser = await newAppUser.save();
       })
       .catch((error) => {
@@ -102,6 +102,16 @@ app.post("/signUp", async (req: Request, res: Response) => {
       });
   } catch {
     res.status(500).json({ error: "internal server Error!" });
+  }
+});
+app.post("/image", async (req: Request, res: Response) => {
+  const { path }: { path: string } = req.body;
+  try {
+    const url = await getDownloadURL(ref(storage, path));
+
+    return res.status(200).json(url);
+  } catch (error) {
+    console.error(error);
   }
 });
 
@@ -122,7 +132,6 @@ app.get("/isAuthenticated", async (req: Request, res: Response) => {
 
     // Return true if user is authenticated
     res.json({ isAuthenticated: true });
-    console.log(idToken);
   } catch (error) {
     console.error(error);
 
@@ -188,6 +197,37 @@ app.post("/postrestaurant", async (req: Request, res: Response) => {
 
 });
 
+app.post("/postrestaurant", async (req: Request, res: Response) => {
+  console.log(req.body)
+ 
+  const newRestraunt = new Restraunt({
+    name: req.body.restaurant,
+    address: req.body.address,
+    rating: req.body.rating,
+    photos: req.body.photos,
+    
+    menu: [
+      {
+        category: req.body.category,
+        meals: [
+          { name: req.body.named, price: req.body.price, description: req.body.descrpt },
+          { name: req.body.named1, price: req.body.price1, description: req.body.descrption1 },
+        ],
+      },
+      {
+        category: req.body.category1,
+        meals: [
+          { name: req.body.dish3, price: req.body.price3, description: req.body.description3 },
+          { name: req.body.dish4, price: req.body.price4, description: req.body.description4  },
+        ],
+      },
+    ],
+  });
+  const insertedRestraunt = await newRestraunt.save();
+  return res.status(201).json(insertedRestraunt);
+
+});
+
 app.post("/signIn", async (req: Request, res: Response) => {
   const { email, password }: basicAuthCred = req.body;
 
@@ -203,10 +243,13 @@ app.post("/signIn", async (req: Request, res: Response) => {
         console.log(user);
 
         const idToken = await user.getIdToken();
+        const userName = user.email;
+
         console.log(idToken);
 
         res.json({
           accessToken: idToken,
+          userEmail: userName,
           message: "User Signed In Successfully",
         });
       })
@@ -259,35 +302,41 @@ app.post("/register", async (_: Request, res: Response) => {
 });
 
 app.post("/create-checkout-session", async (req: Request, res: Response) => {
-  const session = await stripe.checkout.sessions.create({
-    line_items: req.body.map((item) => {
-      return {
-        price_data: {
-          currency: "nok",
-          product_data: {
-            name: item.name,
+  try {
+    const session = await stripe.checkout.sessions.create({
+      line_items: req.body.map((item) => {
+        return {
+          price_data: {
+            currency: "nok",
+            product_data: {
+              name: item.name,
+            },
+            unit_amount: item.price * 100,
           },
-          unit_amount: item.price * 100,
-        },
-        quantity: item.cartQuantity,
-      };
-    }),
+          quantity: item.cartQuantity,
+        };
+      }),
 
-    // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-    // invoice_creation: { enabled: true },
+      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+      // invoice_creation: { enabled: true },
 
-    currency: "nok",
-    mode: "payment",
-    success_url: `http://localhost:5000/success`,
-    cancel_url: `http://localhost:5000/cancel`,
-  });
-  const redirecturl = session.url || "http://localhost:5000";
-  console.log(res);
-  return res.status(200).json(redirecturl);
+      currency: "nok",
+      mode: "payment",
+      success_url: `http://localhost:5000/success`,
+      cancel_url: `http://localhost:5000/cancel`,
+    });
+    const redirecturl = session.url || "http://localhost:5000";
+    console.log(res);
+    return res.status(200).json(redirecturl);
+  } catch (error) {
+    console.error(error);
+    console.log("catched");
+
+    res.status(400).json({ error: "Invalid parameters" });
+  }
 });
 
-app.post("/nodemailer", async (req: Request, res: Response) => {
-  console.log("Email sender...");
+app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -296,22 +345,38 @@ app.post("/nodemailer", async (req: Request, res: Response) => {
     },
   });
 
-  const mailOptions = {
-    from: "cook2goo@gmail.com",
-    to: "lobkovskaya@icloud.com",
-    subject: "Payment Confirmation",
-    text: "Dear customer, payment was successful! Order details:",
-  };
+  try {
+    const items = req.body.data.map(
+      (item) =>
+        `Name: ${item.name}  Price: ${item.price} Quantity: ${item.cartQuantity}, \n`
+    );
+    const mailOptions = {
+      from: "cook2goo@gmail.com",
+      to: req.params.mail,
+      subject: "Payment Confirmation",
+      text:
+        "Dear Customer, payment was successful!" +
+        "\n" +
+        "Order details:" +
+        "\n" +
+        items,
+    };
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.error(error);
-      return res.status(400).json({ Error: "Email error, could not be sent" });
-    } else {
-      console.log("Epost : " + info.response);
-    }
-  });
-  return res.status(200).json(mailOptions);
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.error(error);
+        return res
+          .status(400)
+          .json({ Error: "Email error, could not be sent" });
+      } else {
+        console.log("Epost : " + info.response);
+      }
+    });
+    return res.status(200).json(mailOptions);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: "Invalid parameters" });
+  }
 });
 
 app.use("/success", async (_, res: Response) => {
@@ -335,10 +400,14 @@ app.post("/login", async (req: Request, res: Response) => {
 
 //GET request to localhost:5000/users
 app.get("/restraunts", async (_, res: Response) => {
-  //mongoose
-  const allRestraunts = await Restraunt.find();
-  console.log(allRestraunts);
-  return res.status(200).json(allRestraunts);
+  try {
+    //mongoose
+    const allRestraunts = await Restraunt.find();
+    console.log(allRestraunts);
+    return res.status(200).json(allRestraunts);
+  } catch (error) {
+    return res.status(400).send({ error: "Error occured" });
+  }
 });
 
 app.get("/doris", async (_, res: Response) => {
@@ -350,37 +419,112 @@ app.get("/doris", async (_, res: Response) => {
 
 //GET request. path: localhost:5000/users/
 app.get("/restraunt/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const restraunt = await Restraunt.findById(id);
-  return res.status(200).json(restraunt);
+  try {
+    const { id } = req.params;
+    const restraunt = await Restraunt.findById(id);
+    return res.status(200).json(restraunt);
+  } catch (error) {
+    return res.status(400).send({ error: "Error occured" });
+  }
 });
 
 app.post("/restraunts/", async (_, res: Response) => {
-  const newRestraunt = new Restraunt({
-    name: "String",
-    address: "String",
-    rating: 5,
-    photos:
-      "https://www.foodiesfeed.com/wp-content/uploads/2019/06/top-view-for-box-of-2-burgers-home-made-600x899.jpg",
-    menu: [
-      {
-        category: "category1",
-        meals: [
-          { name: "String", price: 24, description: "String" },
-          { name: "String1", price: 21, description: "String1" },
-        ],
-      },
-      {
-        category: "category1",
-        meals: [
-          { name: "String", price: 22, description: "String" },
-          { name: "String1", price: 33, description: "String1" },
-        ],
-      },
-    ],
-  });
-  const insertedRestraunt = await newRestraunt.save();
-  return res.status(201).json(insertedRestraunt);
+  try {
+    const newRestraunt = new Restraunt({
+      name: "String",
+      address: "String",
+      rating: 5,
+      photos:
+        "https://www.foodiesfeed.com/wp-content/uploads/2019/06/top-view-for-box-of-2-burgers-home-made-600x899.jpg",
+      menu: [
+        {
+          category: "category1",
+          meals: [
+            { name: "String", price: 24, description: "String" },
+            { name: "String1", price: 21, description: "String1" },
+          ],
+        },
+        {
+          category: "category1",
+          meals: [
+            { name: "String", price: 22, description: "String" },
+            { name: "String1", price: 33, description: "String1" },
+          ],
+        },
+      ],
+    });
+    const insertedRestraunt = await newRestraunt.save();
+    return res.status(201).json(insertedRestraunt);
+  } catch (error) {
+    return res.status(400).send({ error: "Error occured" });
+  }
+});
+app.post("/users", async (req, res) => {
+  try {
+    const user = new ApplicationUser(req.body);
+    await user.save();
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+app.get("/users/:id", async (req, res) => {
+  try {
+    const user = await ApplicationUser.findOne({ userId: req.params.id });
+    if (!user) {
+      return res.send([]);
+    }
+
+    if (
+      user.orders == undefined ||
+      user.orders.length == 0 ||
+      user.orders.length == null
+    ) {
+      res.send([]);
+    } else {
+      res.send(user);
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.put("/users/:id", async (req, res) => {
+  const filter = { userId: req.body.data.email };
+  const date = new Date();
+  //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
+  const appended_date = {
+    date: date.toLocaleDateString("en-US"),
+    orderdetails: req.body.data.ordered_dishes,
+  };
+
+  try {
+    // const user = await ApplicationUser.findOneAndUpdate(req.body, {
+    //   new: true,
+    // });
+    const user = await ApplicationUser.findOne(filter);
+    if (!user) {
+      const newUserWithOrder = new ApplicationUser({
+        userId: req.body.data.email,
+        // addressLine1: "testaddress",
+        orders: [appended_date],
+        email: req.body.data.email,
+      });
+
+      await newUserWithOrder.save();
+      return res.status(200).send({ newUserWithOrder });
+    } else {
+      const test = await ApplicationUser.updateOne(filter, {
+        email: req.body.data.email,
+        orders: [...user.orders, appended_date],
+      });
+      user.save;
+    }
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 const start = async () => {
