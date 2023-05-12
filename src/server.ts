@@ -262,7 +262,7 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
             },
             unit_amount: item.price * 100,
           },
-          quantity: item.cartQuantity,
+          quantity: item.quantity,
         };
       }),
 
@@ -275,11 +275,10 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
       cancel_url: `http://localhost:5000/cancel`,
     });
     const redirecturl = session.url || "http://localhost:5000";
-    console.log(res);
+
     return res.status(200).json(redirecturl);
   } catch (error) {
     console.error(error);
-    console.log("catched");
 
     res.status(400).json({ error: "Invalid parameters" });
   }
@@ -298,7 +297,7 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
     const items = req.body.data
       .map(
         (item) =>
-          `Name: ${item.name};  Price: ${item.price} NOK; Quantity: ${item.cartQuantity}. \n`
+          `Name: ${item.name};  Price: ${item.price} NOK; Quantity: ${item.quantity}. \n`
       )
       .join("");
     const mailOptions = {
