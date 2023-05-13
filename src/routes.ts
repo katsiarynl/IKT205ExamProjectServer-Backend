@@ -409,7 +409,7 @@ app.post("/restraunts/", async (_, res: Response) => {
 });
 // router for the Address
 
-app.post("/users", async (req, res) => {
+app.post("/user", async (req, res) => {
   try {
     const user = new ApplicationUser(req.body);
     await user.save();
