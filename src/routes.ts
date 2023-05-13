@@ -247,7 +247,6 @@ app.post("/register", async (_: Request, res: Response) => {
     res.redirect("register");
   }
 });
-
 app.post("/create-checkout-session", async (req: Request, res: Response) => {
   try {
     const session = await stripe.checkout.sessions.create({
@@ -260,7 +259,7 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
             },
             unit_amount: item.price * 100,
           },
-          quantity: item.quantity,
+          quantity: item.cartQuantity,
         };
       }),
 
@@ -269,14 +268,15 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
 
       currency: "nok",
       mode: "payment",
-      success_url: `https://cook2go.herokuapp.com/success`,
-      cancel_url: `https://cook2go.herokuapp.com/cancel`,
+      success_url: `http://localhost:5000/success`,
+      cancel_url: `http://localhost:5000/cancel`,
     });
     const redirecturl = session.url || "http://localhost:5000";
-
+    console.log(res);
     return res.status(200).json(redirecturl);
   } catch (error) {
     console.error(error);
+    console.log("catched");
 
     res.status(400).json({ error: "Invalid parameters" });
   }
@@ -328,11 +328,7 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
 });
 
 app.use("/success", async (_, res: Response) => {
-  return res
-    .status(200)
-    .send(
-      "Your order was successful. If you see this message, return back to the application"
-    );
+  return res.status(200);
 });
 
 app.use("/cancel", async (_, res: Response) => {
@@ -407,6 +403,7 @@ app.post("/restraunts/", async (_, res: Response) => {
     return res.status(400).send({ error: "Error occured" });
   }
 });
+
 // router for the Address
 
 app.post("/user", async (req, res) => {
@@ -447,6 +444,7 @@ app.put("/user/:email", async (req, res) => {
   }
 });
 
+
 app.post("/users", async (req, res) => {
   try {
     const user = new ApplicationUser(req.body);
@@ -481,6 +479,10 @@ app.get("/users/:id", async (req, res) => {
 app.put("/users/:id", async (req, res) => {
   const filter = { userId: req.body.data.email };
   const date = new Date();
+  console.log("-----");
+  console.log(req.body);
+  console.log("-----");
+
   //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
   const appended_date = {
     date: date.toLocaleDateString("en-US"),
@@ -488,6 +490,12 @@ app.put("/users/:id", async (req, res) => {
   };
 
   try {
+    // if (
+    //   req.body.data.ordered_dishes.length == 0 ||
+    //   req.body.data.ordered_dishes.length == 0
+    // ) {
+    //   return res.status(400).send({ message: "badrequest " });
+    // }
     // const user = await ApplicationUser.findOneAndUpdate(req.body, {
     //   new: true,
     // });
