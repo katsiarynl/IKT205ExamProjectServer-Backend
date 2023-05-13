@@ -259,7 +259,7 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
             },
             unit_amount: item.price * 100,
           },
-          quantity: item.cartQuantity,
+          quantity: item.quantity,
         };
       }),
 
