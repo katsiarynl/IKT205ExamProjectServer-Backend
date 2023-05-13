@@ -1,6 +1,76 @@
 import express, { Express, Request, Response } from "express";
 import mongoose from "mongoose";
-import { app } from "./routes";
+import helmet from "helmet";
+import { Restraunt } from "../schemas/restrauntModel";
+import nodemailer from "nodemailer";
+import { storage } from "../firebaseConfigPro";
+import { getDownloadURL, ref } from "firebase/storage";
+//https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
+
+//! fix server tests error: https://stackoverflow.com/questions/55038813/cannot-log-after-tests-are-done-in-jestjs
+
+import "firebase/compat/database";
+//import auth from "../firebaseconfig";
+// importing the auth from the main firebaseConfigPro
+
+import { auth } from "../firebaseConfigPro";
+import admin from "firebase-admin";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import serviceAccount from "../serviceAccount.json" assert { type: "json" };
+//params
+const params = {
+  type: serviceAccount.type,
+  projectId: serviceAccount.project_id,
+  privateKeyId: serviceAccount.private_key_id,
+  privateKey: serviceAccount.private_key,
+  clientEmail: serviceAccount.client_email,
+  clientId: serviceAccount.client_id,
+  authUri: serviceAccount.auth_uri,
+  tokenUri: serviceAccount.token_uri,
+  authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
+  clientC509CertUrl: serviceAccount.client_x509_cert_url,
+};
+
+admin.initializeApp({
+  credential: admin.credential.cert(params),
+  databaseURL: "https://cooktogo-cec09-default-rtdb.firebaseio.com",
+});
+
+// Initialize the Admin App
+// creating post api called isAuthenticated
+
+import Stripe from "stripe";
+const stripe = new Stripe(
+  "sk_test_51MjtQyKZ0QuxsIgFuJ7CepFaI5NM0Ikf8uKOqQrNahb2sA0gPJzmPnjDtqCuPV4pO6Ze3RlKUpgGtjhykBD9Zx7g00oeNYI3l4",
+  {
+    apiVersion: "2022-11-15",
+  }
+);
+
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+
+const PORT = process.env.PORT || 5000;
+
+// https://dev.to/deepakshisood/authentication-using-firebase-for-expressjs-2l48
+
+const { Schema, model } = mongoose;
+
+import { ApplicationUser } from "../schemas/userModel";
+
+import { basicAuthCred } from "./types";
+import { error } from "console";
+
+//https://stackoverflow.com/questions/14588032/mongoose-password-hashing
+//https://www.npmjs.com/package/bcrypt
+
+const uri =
+  "mongodb+srv://cook2goo:XmWKfcOOxtcXNTlu@cook2goo.yxylii0.mongodb.net/";
 
 export const app: Express = express();
 app.use(helmet());
@@ -104,7 +174,7 @@ app.post("/forgetPassword", async (req: Request, res: Response) => {
     await sendPasswordResetEmail(auth, email, linkToReset);
     console.log("Password reset email sent successfully to: ", email);
 
-    res.json({
+    res.status(200).json({
       message: "Link for password rest sent email Successfully!",
     });
   } catch (error: any) {
@@ -337,48 +407,6 @@ app.post("/restraunts/", async (_, res: Response) => {
     return res.status(400).send({ error: "Error occured" });
   }
 });
-///
-
-//POST request. path: localhost:5000/users/
-
-app.post("/user", async (req, res) => {
-  try {
-    const user = new ApplicationUser(req.body);
-    await user.save();
-    res.status(201).send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-app.get("/user/:email", async (req, res) => {
-  try {
-    const user = await ApplicationUser.findOne({ email: req.params.email });
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-app.put("/user/:email", async (req, res) => {
-  try {
-    const user = await ApplicationUser.findOneAndUpdate(
-      { email: req.params.email },
-      req.body,
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
 app.post("/users", async (req, res) => {
   try {
     const user = new ApplicationUser(req.body);
@@ -447,4 +475,20 @@ app.put("/users/:id", async (req, res) => {
   }
 });
 
+// const start = async () => {
+//   try {
+//     await mongoose.connect(uri);
+//     app.listen(PORT, () => {
+//       console.log("listening on " + PORT);
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     process.exit(1);
+//   }
+// };
 
+app.use((_: Request, res: Response) => {
+  res.status(404).send("Server is running");
+});
+
+// start();
