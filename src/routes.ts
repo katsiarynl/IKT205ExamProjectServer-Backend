@@ -247,40 +247,45 @@ app.post("/register", async (_: Request, res: Response) => {
     res.redirect("register");
   }
 });
-app.post("/create-checkout-session", async (req: Request, res: Response) => {
-  try {
-    const session = await stripe.checkout.sessions.create({
-      line_items: req.body.map((item) => {
-        return {
-          price_data: {
-            currency: "nok",
-            product_data: {
-              name: item.name,
+app.post(
+  "/create-checkout-session/:email",
+  async (req: Request, res: Response) => {
+    try {
+      const session = await stripe.checkout.sessions.create({
+        line_items: req.body.map((item) => {
+          return {
+            price_data: {
+              currency: "nok",
+              product_data: {
+                name: item.name,
+              },
+              unit_amount: item.price * 100,
             },
-            unit_amount: item.price * 100,
-          },
-          quantity: item.quantity,
-        };
-      }),
+            quantity: item.quantity,
+          };
+        }),
 
-      // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-      // invoice_creation: { enabled: true },
+        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+        // invoice_creation: { enabled: true },
+        customer_email: req.params.email,
 
-      currency: "nok",
-      mode: "payment",
-      success_url: `http://localhost:5000/success`,
-      cancel_url: `http://localhost:5000/cancel`,
-    });
-    const redirecturl = session.url || "http://localhost:5000";
-    console.log(res);
-    return res.status(200).json(redirecturl);
-  } catch (error) {
-    console.error(error);
-    console.log("catched");
+        currency: "nok",
+        mode: "payment",
+        success_url: `http://localhost:5000/success`,
+        cancel_url: `http://localhost:5000/cancel`,
+      });
+      const redirecturl = session.url || "http://localhost:5000";
 
-    res.status(400).json({ error: "Invalid parameters" });
+      console.log(res);
+      return res.status(200).json(redirecturl);
+    } catch (error) {
+      console.error(error);
+      console.log("catched");
+
+      res.status(400).json({ error: "Invalid parameters" });
+    }
   }
-});
+);
 
 app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
   const transporter = nodemailer.createTransport({
