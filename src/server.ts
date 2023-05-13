@@ -7,6 +7,8 @@ import { storage } from "../firebaseConfigPro";
 import { getDownloadURL, ref } from "firebase/storage";
 //https://blog.jscrambler.com/getting-started-with-react-navigation-v6-and-typescript-in-react-native
 
+//! fix server tests error: https://stackoverflow.com/questions/55038813/cannot-log-after-tests-are-done-in-jestjs
+
 import "firebase/compat/database";
 //import auth from "../firebaseconfig";
 // importing the auth from the main firebaseConfigPro
@@ -106,7 +108,7 @@ app.post("/signUp", async (req: Request, res: Response) => {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(error);
+
         res.status(400).json({ error: errorMessage });
       });
   } catch {
@@ -176,8 +178,6 @@ app.post("/forgetPassword", async (req: Request, res: Response) => {
       message: "Link for password rest sent email Successfully!",
     });
   } catch (error: any) {
-    console.log(error);
-
     res.status(400).json({ Error: error.message });
   }
 });
@@ -205,7 +205,7 @@ app.post("/signIn", async (req: Request, res: Response) => {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(error);
+        console.error(error);
         res.status(400).json({ error: errorMessage });
       });
   } catch {
@@ -220,7 +220,6 @@ app.post("/singOut", async (_: Request, res: Response) => {
     await auth.signOut();
     res.json({ message: "user logged out Successfully!" });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ err: "internal Server Error! " });
   }
 });
@@ -237,7 +236,6 @@ app.post("/register", async (_: Request, res: Response) => {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
       })
       .catch((error) => {
         console.error(error.code);
@@ -271,8 +269,8 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
 
       currency: "nok",
       mode: "payment",
-      success_url: `http://localhost:5000/success`,
-      cancel_url: `http://localhost:5000/cancel`,
+      success_url: `https://cook2go.herokuapp.com/success`,
+      cancel_url: `https://cook2go.herokuapp.com/cancel`,
     });
     const redirecturl = session.url || "http://localhost:5000";
 
@@ -330,12 +328,19 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
 });
 
 app.use("/success", async (_, res: Response) => {
-  console.log("login");
-  return res.status(200);
+  return res
+    .status(200)
+    .send(
+      "Your order was successful. If you see this message, return back to the application"
+    );
 });
+
+app.use("/cancel", async (_, res: Response) => {
+  return res.status(200).send("Something went wrong. Please, try again");
+});
+
 app.post("/login", async (req: Request, res: Response) => {
   const { email, password }: basicAuthCred = req.body;
-  console.log("login");
 
   signInWithEmailAndPassword(auth, "kate@nedenes.com", "katepassword22222")
     .then((userCredential) => {
@@ -353,7 +358,7 @@ app.get("/restraunts", async (_, res: Response) => {
   try {
     //mongoose
     const allRestraunts = await Restraunt.find();
-    console.log(allRestraunts);
+
     return res.status(200).json(allRestraunts);
   } catch (error) {
     return res.status(400).send({ error: "Error occured" });
@@ -458,7 +463,7 @@ app.get("/users/:id", async (req, res) => {
   try {
     const user = await ApplicationUser.findOne({ userId: req.params.id });
     if (!user) {
-      return res.send([]);
+      return await res.send([]);
     }
 
     if (
@@ -466,9 +471,9 @@ app.get("/users/:id", async (req, res) => {
       user.orders.length == 0 ||
       user.orders.length == null
     ) {
-      res.send([]);
+      return res.send([]);
     } else {
-      res.send(user);
+      return res.send(user);
     }
   } catch (error) {
     res.status(500).send(error);
@@ -525,7 +530,7 @@ const start = async () => {
 };
 
 app.use((_: Request, res: Response) => {
-  res.status(404).send(" mongodb");
+  res.status(404).send("Server is running");
 });
 
 start();
