@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../src/server";
+import { app } from "../src/routes";
 
 describe("GET /isAuthenticated endpoint", () => {
   test("It should return a 401 error if Authorization header is missing", async () => {
@@ -8,6 +8,4 @@ describe("GET /isAuthenticated endpoint", () => {
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Unauthorized");
   });
-
-
 });
