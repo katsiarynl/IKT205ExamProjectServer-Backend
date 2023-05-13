@@ -1,6 +1,6 @@
 import request from "supertest";
 import { app } from "../src/routes";
-
+jest.useFakeTimers();
 describe("Test the /login path", () => {
   test("It should redirect to the home page on successful login", async () => {
     const response = await request(app)

@@ -1,5 +1,6 @@
 import request from "supertest";
 import { app } from "../src/routes";
+//routers
 jest.useFakeTimers();
 describe("POST /forgetPassword endpoint", () => {
   test("It should return a 404 error if user is not found for that email", async () => {

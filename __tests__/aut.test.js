@@ -1,6 +1,6 @@
 import request from "supertest";
 import { app } from "../src/routes";
-
+jest.useFakeTimers();
 describe("GET /isAuthenticated endpoint", () => {
   test("It should return a 401 error if Authorization header is missing", async () => {
     const response = await request(app).get("/isAuthenticated");
