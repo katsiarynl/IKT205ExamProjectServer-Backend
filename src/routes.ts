@@ -268,7 +268,7 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
 
       currency: "nok",
       mode: "payment",
-      success_url: `https://cook2go.herokuapp.com/success`,
+      success_url: `http://localhost:5000/success`,
       cancel_url: `http://localhost:5000/cancel`,
     });
     const redirecturl = session.url || "http://localhost:5000";
@@ -328,11 +328,7 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
 });
 
 app.use("/success", async (_, res: Response) => {
-  return res
-    .status(200)
-    .send(
-      "Your payement was successfull. if you see this message, exit the web view"
-    );
+  return res.status(200);
 });
 
 app.use("/cancel", async (_, res: Response) => {
@@ -407,47 +403,6 @@ app.post("/restraunts/", async (_, res: Response) => {
     return res.status(400).send({ error: "Error occured" });
   }
 });
-
-// router for the Address
-
-app.post("/user", async (req, res) => {
-  try {
-    const user = new ApplicationUser(req.body);
-    await user.save();
-    res.status(201).send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-app.get("/user/:email", async (req, res) => {
-  try {
-    const user = await ApplicationUser.findOne({ email: req.params.email });
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-app.put("/user/:email", async (req, res) => {
-  try {
-    const user = await ApplicationUser.findOneAndUpdate(
-      { email: req.params.email },
-      req.body,
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
 app.post("/users", async (req, res) => {
   try {
     const user = new ApplicationUser(req.body);
