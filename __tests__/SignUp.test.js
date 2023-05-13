@@ -1,6 +1,6 @@
 import request from "supertest";
 import { app } from "../src/routes";
-
+jest.useFakeTimers();
 describe("POST /signUp endpoint", () => {
   test("It should return a 400 error if email and/or password is missing", async () => {
     const response = await request(app)
