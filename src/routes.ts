@@ -268,7 +268,7 @@ app.post("/create-checkout-session", async (req: Request, res: Response) => {
 
       currency: "nok",
       mode: "payment",
-      success_url: `http://localhost:5000/success`,
+      success_url: `https://cook2go.herokuapp.com/success`,
       cancel_url: `http://localhost:5000/cancel`,
     });
     const redirecturl = session.url || "http://localhost:5000";
@@ -328,7 +328,11 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
 });
 
 app.use("/success", async (_, res: Response) => {
-  return res.status(200);
+  return res
+    .status(200)
+    .send(
+      "Your payement was successfull. if you see this message, exit the web view"
+    );
 });
 
 app.use("/cancel", async (_, res: Response) => {
@@ -443,7 +447,6 @@ app.put("/user/:email", async (req, res) => {
     res.status(500).send(error);
   }
 });
-
 
 app.post("/users", async (req, res) => {
   try {
