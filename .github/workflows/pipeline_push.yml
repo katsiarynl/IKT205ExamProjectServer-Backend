@@ -1,6 +1,6 @@
 name: CI
  
- #https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
+
 on: [pull_request]
 env:
   GITHUB_TOKEN: ${{secrets.TOKEN}}
@@ -8,8 +8,7 @@ permissions:
   id-token: write
   contents: read
 jobs: 
-  build:
-    name: jest
+  jest:
     runs-on: windows-latest 
     steps:
      - name: Setup Node.js environment
@@ -23,7 +22,7 @@ jobs:
      - name: Run Jest
        uses: jlndk/github-action-jest@1.0.3
   eslint:
-#     needs: [build]
+    needs: [jest]
     runs-on: windows-latest
     steps: 
      - name: Setup Node.js environment
