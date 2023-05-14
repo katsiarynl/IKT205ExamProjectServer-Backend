@@ -251,6 +251,7 @@ app.post(
   "/create-checkout-session/:email",
   async (req: Request, res: Response) => {
     try {
+      console.log("I ago here");
       const session = await stripe.checkout.sessions.create({
         line_items: req.body.map((item) => {
           return {
@@ -271,7 +272,7 @@ app.post(
 
         currency: "nok",
         mode: "payment",
-        success_url: `http://localhost:5000/success`,
+        success_url: `https://cook2go.herokuapp.com/success`,
         cancel_url: `http://localhost:5000/cancel`,
       });
       const redirecturl = session.url || "http://localhost:5000";
@@ -333,7 +334,9 @@ app.post("/nodemailer/:mail", async (req: Request, res: Response) => {
 });
 
 app.use("/success", async (_, res: Response) => {
-  return res.status(200);
+  return res
+    .status(200)
+    .send("Your order was successful. Please, return back to the application");
 });
 
 app.use("/cancel", async (_, res: Response) => {
