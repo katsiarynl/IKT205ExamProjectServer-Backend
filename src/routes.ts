@@ -59,12 +59,9 @@ const PORT = process.env.PORT || 5000;
 
 // https://dev.to/deepakshisood/authentication-using-firebase-for-expressjs-2l48
 
-const { Schema, model } = mongoose;
-
 import { ApplicationUser } from "../schemas/userModel";
 
 import { basicAuthCred } from "./types";
-import { error } from "console";
 
 //https://stackoverflow.com/questions/14588032/mongoose-password-hashing
 //https://www.npmjs.com/package/bcrypt
@@ -273,9 +270,9 @@ app.post(
         currency: "nok",
         mode: "payment",
         success_url: `https://cook2go.herokuapp.com/success`,
-        cancel_url: `http://localhost:5000/cancel`,
+        cancel_url: `https://cook2go.herokuapp.com/cancel`,
       });
-      const redirecturl = session.url || "http://localhost:5000";
+      const redirecturl = session.url;
 
       console.log(res);
       return res.status(200).json(redirecturl);
@@ -411,7 +408,7 @@ app.post("/restraunts/", async (_, res: Response) => {
     return res.status(400).send({ error: "Error occured" });
   }
 });
-app.post("/user", async (req, res) => {
+app.post("/user", async (req: Request, res: Response) => {
   try {
     const user = new ApplicationUser(req.body);
     await user.save();
@@ -421,7 +418,7 @@ app.post("/user", async (req, res) => {
   }
 });
 
-app.get("/user/:email", async (req, res) => {
+app.get("/user/:email", async (req: Request, res: Response) => {
   try {
     const user = await ApplicationUser.findOne({ email: req.params.email });
     if (!user) {
@@ -433,7 +430,7 @@ app.get("/user/:email", async (req, res) => {
   }
 });
 
-app.put("/user/:email", async (req, res) => {
+app.put("/user/:email", async (req: Request, res: Response) => {
   try {
     const user = await ApplicationUser.findOneAndUpdate(
       { email: req.params.email },
@@ -449,7 +446,7 @@ app.put("/user/:email", async (req, res) => {
   }
 });
 
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id", async (req: Request, res: Response) => {
   try {
     const user = await ApplicationUser.findOne({ userId: req.params.id });
     if (!user) {
@@ -470,7 +467,7 @@ app.get("/users/:id", async (req, res) => {
   }
 });
 
-app.put("/users/:id", async (req, res) => {
+app.put("/users/:id", async (req: Request, res: Response) => {
   const filter = { userId: req.body.data.email };
   const date = new Date();
   console.log("-----");
@@ -484,15 +481,6 @@ app.put("/users/:id", async (req, res) => {
   };
 
   try {
-    // if (
-    //   req.body.data.ordered_dishes.length == 0 ||
-    //   req.body.data.ordered_dishes.length == 0
-    // ) {
-    //   return res.status(400).send({ message: "badrequest " });
-    // }
-    // const user = await ApplicationUser.findOneAndUpdate(req.body, {
-    //   new: true,
-    // });
     const user = await ApplicationUser.findOne(filter);
     if (!user) {
       const newUserWithOrder = new ApplicationUser({
@@ -517,20 +505,6 @@ app.put("/users/:id", async (req, res) => {
   }
 });
 
-// const start = async () => {
-//   try {
-//     await mongoose.connect(uri);
-//     app.listen(PORT, () => {
-//       console.log("listening on " + PORT);
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     process.exit(1);
-//   }
-// };
-
 app.use((_: Request, res: Response) => {
   res.status(404).send("Server is running");
 });
-
-// start();
