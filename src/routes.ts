@@ -270,7 +270,7 @@ app.post(
         currency: "nok",
         mode: "payment",
         success_url: `https://cook2go.herokuapp.com/success`,
-        cancel_url: `http://localhost:5000/cancel`,
+        cancel_url: `https://cook2go.herokuapp.com/cancel`,
       });
       const redirecturl = session.url;
 
