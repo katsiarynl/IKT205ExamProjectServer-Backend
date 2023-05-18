@@ -248,7 +248,6 @@ app.post(
   "/create-checkout-session/:email",
   async (req: Request, res: Response) => {
     try {
-      console.log("I ago here");
       const session = await stripe.checkout.sessions.create({
         line_items: req.body.map((item) => {
           return {
@@ -263,8 +262,6 @@ app.post(
           };
         }),
 
-        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        // invoice_creation: { enabled: true },
         customer_email: req.params.email,
 
         currency: "nok",
@@ -470,9 +467,6 @@ app.get("/users/:id", async (req: Request, res: Response) => {
 app.put("/users/:id", async (req: Request, res: Response) => {
   const filter = { userId: req.body.data.email };
   const date = new Date();
-  console.log("-----");
-  console.log(req.body);
-  console.log("-----");
 
   //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
   const appended_date = {
@@ -485,7 +479,7 @@ app.put("/users/:id", async (req: Request, res: Response) => {
     if (!user) {
       const newUserWithOrder = new ApplicationUser({
         userId: req.body.data.email,
-        // addressLine1: "testaddress",
+
         orders: [appended_date],
         email: req.body.data.email,
       });
@@ -493,11 +487,11 @@ app.put("/users/:id", async (req: Request, res: Response) => {
       await newUserWithOrder.save();
       return res.status(200).send({ newUserWithOrder });
     } else {
-      const test = await ApplicationUser.updateOne(filter, {
+      await user.updateOne({
         email: req.body.data.email,
         orders: [...user.orders, appended_date],
       });
-      user.save;
+      await user.save();
     }
     res.status(200).send(user);
   } catch (error) {
