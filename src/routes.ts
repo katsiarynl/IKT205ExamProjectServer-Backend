@@ -112,6 +112,7 @@ app.post("/signUp", async (req: Request, res: Response) => {
     res.status(500).json({ error: "internal server Error!" });
   }
 });
+//https://firebase.google.com/docs/storage/web/upload-files
 app.post("/image", async (req: Request, res: Response) => {
   const { path }: { path: string } = req.body;
   try {
