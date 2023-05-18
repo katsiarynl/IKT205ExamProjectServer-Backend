@@ -112,6 +112,7 @@ app.post("/signUp", async (req: Request, res: Response) => {
     res.status(500).json({ error: "internal server Error!" });
   }
 });
+//https://firebase.google.com/docs/storage/web/upload-files
 app.post("/image", async (req: Request, res: Response) => {
   const { path }: { path: string } = req.body;
   try {
@@ -243,6 +244,51 @@ app.post("/register", async (_: Request, res: Response) => {
   } catch (e) {
     res.redirect("register");
   }
+});
+app.post("/postrestaurant", async (req: Request, res: Response) => {
+  console.log(req.body);
+
+  const newRestraunt = new Restraunt({
+    name: req.body.restaurant,
+    address: req.body.address,
+    rating: req.body.rating,
+    photos: req.body.photos,
+
+    menu: [
+      {
+        category: req.body.category,
+        meals: [
+          {
+            name: req.body.named,
+            price: req.body.price,
+            description: req.body.descrpt,
+          },
+          {
+            name: req.body.named1,
+            price: req.body.price1,
+            description: req.body.descrption1,
+          },
+        ],
+      },
+      {
+        category: req.body.category1,
+        meals: [
+          {
+            name: req.body.dish3,
+            price: req.body.price3,
+            description: req.body.description3,
+          },
+          {
+            name: req.body.dish4,
+            price: req.body.price4,
+            description: req.body.description4,
+          },
+        ],
+      },
+    ],
+  });
+  const insertedRestraunt = await newRestraunt.save();
+  return res.status(201).json(insertedRestraunt);
 });
 app.post(
   "/create-checkout-session/:email",
