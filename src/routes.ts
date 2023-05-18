@@ -89,7 +89,7 @@ app.post("/signUp", async (req: Request, res: Response) => {
         const user = await ApplicationUser.findOne(filter);
 
         const newAppUser = new ApplicationUser({
-          email: newUser.email,
+          userId: newUser.email,
         });
         if (!user) {
           await newAppUser.save();
