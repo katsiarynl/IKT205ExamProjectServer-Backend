@@ -85,11 +85,11 @@ app.post("/signUp", async (req: Request, res: Response) => {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (newUserCredential) => {
         const newUser = newUserCredential.user;
-        const filter = { userId: newUser.email };
+        const filter = { email: newUser.email };
         const user = await ApplicationUser.findOne(filter);
 
         const newAppUser = new ApplicationUser({
-          userId: newUser.email,
+          email: newUser.email,
         });
         if (!user) {
           await newAppUser.save();
@@ -445,7 +445,7 @@ app.put("/user/:email", async (req: Request, res: Response) => {
 
 app.get("/users/:id", async (req: Request, res: Response) => {
   try {
-    const user = await ApplicationUser.findOne({ userId: req.params.id });
+    const user = await ApplicationUser.findOne({ email: req.params.id });
     if (!user) {
       return await res.send([]);
     }
@@ -465,7 +465,7 @@ app.get("/users/:id", async (req: Request, res: Response) => {
 });
 
 app.put("/users/:id", async (req: Request, res: Response) => {
-  const filter = { userId: req.body.data.email };
+  const filter = { email: req.body.data.email };
   const date = new Date();
 
   //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
@@ -478,8 +478,6 @@ app.put("/users/:id", async (req: Request, res: Response) => {
     const user = await ApplicationUser.findOne(filter);
     if (!user) {
       const newUserWithOrder = new ApplicationUser({
-        userId: req.body.data.email,
-
         orders: [appended_date],
         email: req.body.data.email,
       });
